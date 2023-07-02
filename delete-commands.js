@@ -9,7 +9,7 @@ const rest = new REST().setToken(token);
 		const route = process.argv[2] === 'develop'
 			? Routes.applicationGuildCommand(clientId, guildId, commandId)
 			: Routes.applicationCommand(clientId, commandId);
-		const data = await rest.delete(route);
+		await rest.delete(route);
 		console.log(`Successfully deleted ${commandId} application (/) command.`);
 	}
 	catch (error) {
