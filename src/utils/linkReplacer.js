@@ -1,7 +1,7 @@
 module.exports = function replaceLink(message) {
 	// Regex patterns to match URLs
 	const instagramPattern = /(http[s]?:\/\/(?:www\.)?instagram\.[a-zA-Z0-9-]+\/(?:[a-zA-Z0-9_.]+\/(?:stories|live|p|reel)\/)?[a-zA-Z0-9_-]+(?:\?.*)?)/g;
-  const tiktokPattern = /(http[s]?:\/\/(?:www\.)?tiktok\.[a-zA-Z0-9-]+\/((@([a-zA-Z0-9_.]+)(\/video\/[0-9]+)?)|(t\/ZT[a-zA-Z0-9_]+\/))?(?:\?.*)?)/g;
+	const tiktokPattern = /(http[s]?:\/\/(?:www\.)?tiktok\.[a-zA-Z0-9-]+\/((@([a-zA-Z0-9_.]+)(\/video\/[0-9]+)?)|(t\/ZT[a-zA-Z0-9_]+\/))?(?:\?.*)?)/g;
 	const twitterPattern = /(http[s]?:\/\/(?:www\.|m\.|mobile\.)?twitter\.[a-zA-Z0-9-]+\/(?:i\/status|([a-zA-Z0-9_]+)\/status)\/([0-9]+)(\?[a-zA-Z0-9_=&-]*)?)/g;
 
 	let newMessage = message;

@@ -130,3 +130,4 @@ dist
 .pnp.*
 
 config.json
+embetter.db
