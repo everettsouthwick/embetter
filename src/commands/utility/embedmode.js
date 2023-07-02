@@ -20,6 +20,6 @@ module.exports = {
 	async execute(interaction) {
 		// interaction.guild is the object representing the Guild in which the command was run
 		setGuildMode(interaction.guild.id, interaction.options.getInteger('embedmode'));
-		await interaction.reply(`You have selected ${EmbedMode.getModeName(interaction.options.getInteger('embedmode'))}.`);
+		await interaction.reply({ content: `You have selected ${EmbedMode.getModeName(interaction.options.getInteger('embedmode'))}.`, ephemeral: true });
 	},
 };
