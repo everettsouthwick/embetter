@@ -8,24 +8,21 @@ module.exports = {
 	name: Events.MessageCreate,
 	execute(message) {
 		if (!message.author.bot) {
-			getGuildMode(message.guildId, (mode) => {
-				if (mode == EmbedMode.REPLACE) {
-					const newMessage = replaceLink(message.content);
-					if (newMessage != message.content) {
+			const newMessage = replaceLink(message.content);
+			if (newMessage != message.content) {
+				getGuildMode(message.guildId, (mode) => {
+					if (mode == EmbedMode.REPLACE) {
 						message.delete();
 						message.channel.send(`${message.author}: ${newMessage}`);
 					}
-				}
-				else if (mode == EmbedMode.REPLY) {
-					const newMessage = replaceLink(message.content);
-					if (newMessage != message.content) {
+					else if (mode == EmbedMode.REPLY) {
 						message.reply(newMessage);
 					}
-				}
-				else {
-					// Do nothing
-				}
-			});
+					else {
+						// Do nothing
+					}
+				});
+			}
 		}
 	},
 };
