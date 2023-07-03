@@ -5,7 +5,7 @@ const EmbedMode = require('../../../utils/embedMode.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('embedmode')
-		.setDescription('Sets the mode for embeds. By default, this is set to manual.')
+		.setDescription('Sets the mode for embeds. By default, this is set to reply.')
 		.addIntegerOption(option => option
 			.setName('mode')
 			.setDescription('Replace: Delete and resend, Reply: Keep and send, Manual: Do nothing.')
