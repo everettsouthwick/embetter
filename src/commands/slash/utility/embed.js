@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const replaceLink = require('../../utils/linkReplacer.js');
+const replaceLink = require('../../../utils/linkReplacer.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
