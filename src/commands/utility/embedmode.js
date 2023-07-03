@@ -15,7 +15,7 @@ module.exports = {
 				{ name: 'Reply', value: EmbedMode.REPLY },
 				{ name: 'Manual', value: EmbedMode.MANUAL },
 			))
-		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 		.setDMPermission(false),
 	async execute(interaction) {
 		// interaction.guild is the object representing the Guild in which the command was run
