@@ -3,6 +3,7 @@ module.exports = function replaceLink(message) {
 	const instagramPattern = /(http[s]?:\/\/(?:www\.)?instagram\.[a-zA-Z0-9-]+\/(?:[a-zA-Z0-9_.]+\/(?:stories|live|p|reel)\/)?[a-zA-Z0-9_-]+(?:\?.*)?)/g;
 	const tiktokPattern = /(http[s]?:\/\/(?:www\.)?tiktok\.[a-zA-Z0-9-]+\/((@([a-zA-Z0-9_.]+)(\/video\/[0-9]+)?)|(t\/ZT[a-zA-Z0-9_]+\/))?(?:\?.*)?)/g;
 	const twitterPattern = /(http[s]?:\/\/(?:www\.|m\.|mobile\.)?twitter\.[a-zA-Z0-9-]+\/(?:i\/status|([a-zA-Z0-9_]+)\/status)\/([0-9]+)(\?[a-zA-Z0-9_=&-]*)?)/g;
+    const youtubeShortsPattern = /(http[s]?:\/\/(?:www\.)?youtube\.[a-zA-Z0-9-]+\/shorts\/[a-zA-Z0-9_-]+(?:\?.*)?)/g;
 
 	let newMessage = message;
 	const links = [];
@@ -31,6 +32,14 @@ module.exports = function replaceLink(message) {
 			return newUrl;
 		});
 	}
+
+    if (youtubeShortsPattern.test(message)) {
+        newMessage = newMessage.replace(youtubeShortsPattern, (url) => {
+            const newUrl = url.replace('/shorts/', '/video/');
+            links.push(newUrl);
+            return newUrl;
+        });
+    }
 
 	return { fullMessage: newMessage, links: links };
 };
