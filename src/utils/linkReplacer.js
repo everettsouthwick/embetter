@@ -1,45 +1,44 @@
 module.exports = function replaceLink(message) {
-	// Regex patterns to match URLs
-	const instagramPattern = /(http[s]?:\/\/(?:www\.)?instagram\.[a-zA-Z0-9-]+\/(?:[a-zA-Z0-9_.]+\/(?:stories|live|p|reel)\/)?[a-zA-Z0-9_-]+(?:\?.*)?)/g;
-	const tiktokPattern = /(http[s]?:\/\/(?:www\.)?tiktok\.[a-zA-Z0-9-]+\/((@([a-zA-Z0-9_.]+)(\/video\/[0-9]+)?)|(t\/ZT[a-zA-Z0-9_]+\/))?(?:\?.*)?)/g;
-	const twitterPattern = /(http[s]?:\/\/(?:www\.|m\.|mobile\.)?twitter\.[a-zA-Z0-9-]+\/(?:i\/status|([a-zA-Z0-9_]+)\/status)\/([0-9]+)(\?[a-zA-Z0-9_=&-]*)?)/g;
-    const youtubeShortsPattern = /(http[s]?:\/\/(?:www\.)?youtube\.[a-zA-Z0-9-]+\/shorts\/[a-zA-Z0-9_-]+(?:\?.*)?)/g;
+    const platforms = [
+        {
+            name: 'Instagram',
+            pattern: /(http[s]?:\/\/(?:www\.)?instagram\.[a-zA-Z0-9-]+\/(?:p|stories|live|reel)(.*))/g,
+			match: 'instagram.',
+            replacement: 'ddinstagram.'
+        },
+        {
+            name: 'TikTok',
+            pattern: /(http[s]?:\/\/(?:www\.|vm\.)?tiktok\.[a-zA-Z0-9-]+\/([a-zA-Z0-9_\/]*))(?:\?.*)?/g,
+			match: 'tiktok.',
+            replacement: 'vxtiktok.'
+        },
+        {
+            name: 'Twitter',
+            pattern: /(http[s]?:\/\/(?:www\.|m\.|mobile\.)?twitter\.[a-zA-Z0-9-]+\/(?:i\/status|([a-zA-Z0-9_]+)\/status)\/([0-9]+)(\?[a-zA-Z0-9_=&-]*)?)/g,
+			match: 'twitter.',
+            replacement: 'vxtwitter.'
+        },
+        {
+            name: 'YouTube',
+            pattern: /(http[s]?:\/\/(?:www\.)?youtube\.[a-zA-Z0-9-]+\/shorts\/[a-zA-Z0-9_-]+(?:\?.*)?)/g,
+			match: 'youtube.',
+            replacement: '/video/'
+        }
+    ];
 
-	let newMessage = message;
-	const links = [];
+    let newMessage = message;
+    const links = [];
 
-	// Check if the message contains a URL of the old domain and replace it
-	if (instagramPattern.test(message)) {
-		newMessage = newMessage.replace(instagramPattern, (url) => {
-			const newUrl = url.replace('instagram.', 'ddinstagram.');
-			links.push(newUrl);
-			return newUrl;
-		});
-	}
-
-	if (tiktokPattern.test(message)) {
-		newMessage = newMessage.replace(tiktokPattern, (url) => {
-			const newUrl = url.replace('tiktok.', 'vxtiktok.');
-			links.push(newUrl);
-			return newUrl;
-		});
-	}
-
-	if (twitterPattern.test(message)) {
-		newMessage = newMessage.replace(twitterPattern, (url) => {
-			const newUrl = url.replace('twitter.', 'vxtwitter.');
-			links.push(newUrl);
-			return newUrl;
-		});
-	}
-
-    if (youtubeShortsPattern.test(message)) {
-        newMessage = newMessage.replace(youtubeShortsPattern, (url) => {
-            const newUrl = url.replace('/shorts/', '/video/');
-            links.push(newUrl);
-            return newUrl;
-        });
+    // Iterate over each platform
+    for (let platform of platforms) {
+        if (platform.pattern.test(message)) {
+            newMessage = newMessage.replace(platform.pattern, (url) => {
+                const newUrl = url.replace(platform.match, platform.replacement);
+                links.push(newUrl);
+                return newUrl;
+            });
+        }
     }
 
-	return { fullMessage: newMessage, links: links };
+    return { fullMessage: newMessage, links: links };
 };
