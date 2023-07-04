@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const handleLinkMessage = require('../utils/handleLinkMessage.js');
+const { handleLinkMessage } = require('../utils/handleLinkMessage.js');
 
 module.exports = {
 	name: Events.MessageCreate,
