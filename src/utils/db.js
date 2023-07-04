@@ -23,7 +23,8 @@ function setGuildMode(guild_id, mode) {
 			if (err) {
 				console.error(err.message);
 				reject(err);
-			} else {
+			}
+			else {
 				console.log(`Mode ${mode} set for guild ${guild_id}.`);
 				resolve();
 			}
@@ -37,7 +38,8 @@ function getGuildMode(guild_id) {
 			if (err) {
 				console.error(err.message);
 				reject(err);
-			} else {
+			}
+			else {
 				// If no results were found, row will be `undefined`, and mode will be `null`.
 				const mode = row ? row.mode : null;
 				resolve(mode);

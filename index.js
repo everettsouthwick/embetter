@@ -15,23 +15,26 @@ client.commands = new Collection();
 function loadItems(dir, type) {
 	const files = fs.readdirSync(dir);
 
-	for (let file of files) {
-		let fullPath = path.join(dir, file);
+	for (const file of files) {
+		const fullPath = path.join(dir, file);
 
-		// Check if path is directory
 		if (fs.lstatSync(fullPath).isDirectory()) {
-			loadItems(fullPath, type);  // Recurse into directories
-		} else if (file.endsWith('.js')) {  // Check if file is a JavaScript file
+			loadItems(fullPath, type);
+		}
+		else if (file.endsWith('.js')) {
 			const item = require(fullPath);
 			if (type === 'commands' && 'data' in item && 'execute' in item) {
 				client.commands.set(item.data.name, item);
-			} else if (type === 'events') {
+			}
+			else if (type === 'events') {
 				if (item.once) {
 					client.once(item.name, (...args) => item.execute(...args));
-				} else {
+				}
+				else {
 					client.on(item.name, (...args) => item.execute(...args));
 				}
-			} else {
+			}
+			else {
 				console.log(`[WARNING] The ${type} at ${fullPath} is missing required properties.`);
 			}
 		}
