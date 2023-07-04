@@ -1,12 +1,11 @@
 const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.js');
-const replaceLink = require('../../../utils/linkReplacer.js');
-const { handleContextMenuLink } = require('../../../utils/handleLinkMessage.js');
+const { handleContextMenuLink } = require('../../../utils/handleLinkResponse.js');
 
 module.exports = {
 	data: new ContextMenuCommandBuilder()
 		.setName('Embed')
-        .setType(ApplicationCommandType.Message),
+		.setType(ApplicationCommandType.Message),
 	async execute(interaction) {
-		await handleContextMenuLink(interaction)
+		await handleContextMenuLink(interaction);
 	},
 };
