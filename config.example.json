@@ -1,5 +1,6 @@
 {
     "token": "",
     "clientId": "",
-    "guildId": ""
+    "guildId": "",
+    "commandId": ""
 }

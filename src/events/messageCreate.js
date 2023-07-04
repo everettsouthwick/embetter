@@ -1,15 +1,11 @@
 const { Events } = require('discord.js');
-const replaceLink = require('../utils/linkReplacer.js');
+const handleLinkMessage = require('../utils/handleLinkMessage.js');
 
 module.exports = {
 	name: Events.MessageCreate,
-	execute(message) {
+	async execute(message) {
 		if (!message.author.bot) {
-			const newMessage = replaceLink(message.content);
-			if (newMessage != message.content) {
-				message.delete();
-				message.channel.send(`${message.author}: ${newMessage}`);
-			}
+            handleLinkMessage(message);
 		}
 	},
 };

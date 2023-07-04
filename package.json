@@ -4,15 +4,16 @@
   "description": "Embed better with embetter. Replaces Instagram, TikTok, and Twitter links on Discord with embed-friendly options.",
   "main": "index.js",
   "scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node .",
-		"lint": "eslint ."
-	},
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node .",
+    "lint": "eslint ."
+  },
   "repository": "https://github.com/everettsouthwick/embetter.git",
   "author": "Everett Southwick <everett@southwick.dev>",
   "license": "GPL-3.0",
   "dependencies": {
-    "discord.js": "^14.11.0"
+    "discord.js": "^14.11.0",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "eslint": "^8.44.0"

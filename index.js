@@ -10,36 +10,36 @@ const client = new Client({ intents: [
 ] });
 
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'src/commands');
-const commandFolders = fs.readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-		}
-		else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+// General function to load items (commands or events)
+function loadItems(dir, type) {
+	const files = fs.readdirSync(dir);
+
+	for (let file of files) {
+		let fullPath = path.join(dir, file);
+
+		// Check if path is directory
+		if (fs.lstatSync(fullPath).isDirectory()) {
+			loadItems(fullPath, type);  // Recurse into directories
+		} else if (file.endsWith('.js')) {  // Check if file is a JavaScript file
+			const item = require(fullPath);
+			if (type === 'commands' && 'data' in item && 'execute' in item) {
+				client.commands.set(item.data.name, item);
+			} else if (type === 'events') {
+				if (item.once) {
+					client.once(item.name, (...args) => item.execute(...args));
+				} else {
+					client.on(item.name, (...args) => item.execute(...args));
+				}
+			} else {
+				console.log(`[WARNING] The ${type} at ${fullPath} is missing required properties.`);
+			}
 		}
 	}
 }
 
-const eventsPath = path.join(__dirname, 'src/events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	}
-	else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
-}
+// Start recursion from root directories
+loadItems(path.join(__dirname, 'src/commands'), 'commands');
+loadItems(path.join(__dirname, 'src/events'), 'events');
 
 client.login(token);
