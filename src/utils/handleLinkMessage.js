@@ -11,7 +11,7 @@ const sendReplaceModeMessage = async (message, fullMessage) => {
 const sendReplyModeMessage = async (message, links) => {
     const confirm = new ButtonBuilder()
         .setCustomId('confirm')
-        .setLabel('Delete original message')
+        .setLabel('Delete')
         .setStyle(ButtonStyle.Danger);
 
     const cancel = new ButtonBuilder()
@@ -32,7 +32,7 @@ const sendReplyModeMessage = async (message, links) => {
         await confirmation.update({ components: [] });
 
         if (confirmation.customId === 'confirm') {
-            await message.delete();   
+            await response.delete();
         }
     } catch (e) {
         // Do nothing
@@ -61,19 +61,19 @@ const sendManualModeMessage = async (message, links) => {
         const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
         if (confirmation.customId === 'confirm') {
             sendReplyModeMessage(message, links);
-            await confirmation.update({ content: `The link has been embedded.`, components: [] });
+            await confirmation.update({ components: [] });
             await response.delete();
         } else if (confirmation.customId === 'cancel') {
-            await confirmation.update({ content: `The link will not be embedded.`, components: [] });
+            await confirmation.update({ components: [] });
             await response.delete();
         }
     } catch (e) {
-        await response.edit({ content: 'Confirmation not received in 1 minute, cancelling.', components: [] });
+        await response.edit({ components: [] });
         await response.delete();
     }
 };
 
-module.exports = async (message) => {
+const handleLinkMessage = async (message) => {
     const { fullMessage, links } = replaceLink(message.content);
     if (links.length > 0) {
         getGuildMode(message.guildId, async (mode) => {
@@ -88,4 +88,9 @@ module.exports = async (message) => {
             }
         });
     }
+}
+
+module.exports = { 
+    sendReplyModeMessage, 
+    handleLinkMessage 
 };
