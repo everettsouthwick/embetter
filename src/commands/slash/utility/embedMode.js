@@ -5,15 +5,15 @@ const EmbedMode = require('../../../utils/embedMode.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('embedmode')
-		.setDescription('Sets the mode for embeds. By default, this is set to reply.')
+		.setDescription('Sets the mode for embeds. By default, this is set to ask.')
 		.addIntegerOption(option => option
 			.setName('mode')
-			.setDescription('Replace: Delete and resend, Reply: Keep and send, Manual: Do nothing.')
+			.setDescription('Replace: Delete and resend, Reply: Keep and send, Ask: Ask the user.')
 			.setRequired(true)
 			.addChoices(
 				{ name: 'Replace', value: EmbedMode.REPLACE },
 				{ name: 'Reply', value: EmbedMode.REPLY },
-				{ name: 'Manual', value: EmbedMode.MANUAL },
+				{ name: 'Ask', value: EmbedMode.ASK },
 			))
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 		.setDMPermission(false),
