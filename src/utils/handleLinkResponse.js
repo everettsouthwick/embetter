@@ -1,7 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const replaceLink = require('./handleLink.js');
+const { processArchive, processLink } = require('./handleLink.js');
 const { getGuildMode } = require('./db.js');
-const EmbedMode = require('./embedMode.js');
+const EmbedMode = require('../models/embedMode.js');
 
 async function sendReplaceModeMessage(message, fullMessage, embeds) {
 	await message.delete();
@@ -91,8 +91,18 @@ async function sendAskModeMessage(message, links, embeds) {
 }
 
 async function handleContextMenuLink(interaction) {
-	const { links, embeds } = await replaceLink(interaction.targetMessage.content);
+	const { links, embeds } = await processLink(interaction.targetMessage.content);
 	if (links.length > 0 || embeds.length > 0) {
+		sendReplyModeMessage(interaction, links, embeds);
+	}
+	else {
+		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
+	}
+}
+
+async function handleContextMenuArchive(interaction) {
+	const { links, embeds } = await processArchive(interaction.targetMessage.content);
+	if (embeds.length > 0) {
 		sendReplyModeMessage(interaction, links, embeds);
 	}
 	else {
@@ -101,7 +111,7 @@ async function handleContextMenuLink(interaction) {
 }
 
 async function handleSlashCommandLink(interaction) {
-	const { links, embeds } = await replaceLink(interaction.options.getString('link'));
+	const { links, embeds } = await processLink(interaction.options.getString('link'));
 	if (links.length > 0 || embeds.length > 0) {
 		sendReplyModeMessage(interaction, links, embeds);
 	}
@@ -110,8 +120,18 @@ async function handleSlashCommandLink(interaction) {
 	}
 }
 
+async function handleSlashCommandArchive(interaction) {
+	const { links, embeds } = await processArchive(interaction.options.getString('link'));
+	if (embeds.length > 0) {
+		sendReplyModeMessage(interaction, links, embeds);
+	}
+	else {
+		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
+	}
+}
+
 async function handleMessageLink(message) {
-	const { fullMessage, links, embeds } = await replaceLink(message.content);
+	const { fullMessage, links, embeds } = await processLink(message.content);
 	if (links.length > 0 || embeds.length > 0) {
 		const mode = await getGuildMode(message.guild.id);
 		if (mode == EmbedMode.REPLACE) {
@@ -128,6 +148,8 @@ async function handleMessageLink(message) {
 
 module.exports = {
 	handleContextMenuLink,
+    handleContextMenuArchive,
 	handleSlashCommandLink,
+    handleSlashCommandArchive,
 	handleMessageLink,
 };

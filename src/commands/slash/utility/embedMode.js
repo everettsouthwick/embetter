@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { setGuildMode } = require('../../../utils/db.js');
-const EmbedMode = require('../../../utils/embedMode.js');
+const EmbedMode = require('../../../models/embedMode.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
