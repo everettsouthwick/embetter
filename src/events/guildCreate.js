@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const EmbedMode = require('../utils/embedMode.js');
+const EmbedMode = require('../models/embedMode.js');
 const { setGuildMode } = require('../utils/db.js');
 
 
