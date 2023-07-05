@@ -1,7 +1,7 @@
 const EmbedMode = {
 	REPLACE: 0,
 	REPLY: 1,
-	MANUAL: 2,
+	ASK: 2,
 
 	getModeName(value) {
 		for (const modeName in this) {

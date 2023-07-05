@@ -54,7 +54,7 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	}
 }
 
-async function sendManualModeMessage(message, links, embeds) {
+async function sendAskModeMessage(message, links, embeds) {
 	const confirm = new ButtonBuilder()
 		.setCustomId('confirm')
 		.setLabel('Yes')
@@ -141,7 +141,7 @@ async function handleMessageLink(message) {
 			await sendReplyModeMessage(message, links, embeds);
 		}
 		else {
-			await sendManualModeMessage(message, links, embeds);
+			await sendAskModeMessage(message, links, embeds);
 		}
 	}
 }
