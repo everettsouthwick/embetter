@@ -140,7 +140,7 @@ async function handleMessageLink(message) {
 		else if (mode == EmbedMode.REPLY) {
 			await sendReplyModeMessage(message, links, embeds);
 		}
-		else {
+		else if (mode == EmbedMode.ASK) {
 			await sendAskModeMessage(message, links, embeds);
 		}
 	}
