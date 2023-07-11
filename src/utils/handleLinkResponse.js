@@ -1,15 +1,15 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { processArchive, processLink } = require('./handleLink.js');
 const { getGuildMode } = require('./db.js');
-const EmbedMode = require('../models/embedMode.js');
+const { Mode } = require('../models/mode.js');
 
 async function sendReplaceModeMessage(message, fullMessage, embeds) {
 	await message.delete();
 	if (embeds.length > 0) {
-		await message.channel.send({ content:`${message.author}: ${fullMessage}`, embeds: embeds });
+		await message.channel.send({ content: `${message.author}: ${fullMessage}`, embeds: embeds });
 	}
 	else {
-		await message.channel.send({ content:`${message.author}: ${fullMessage}` });
+		await message.channel.send({ content: `${message.author}: ${fullMessage}` });
 	}
 
 }
@@ -134,13 +134,13 @@ async function handleMessageLink(message) {
 	const { fullMessage, links, embeds } = await processLink(message.content);
 	if (links.length > 0 || embeds.length > 0) {
 		const mode = await getGuildMode(message.guild.id);
-		if (mode == EmbedMode.REPLACE) {
+		if (mode == Mode.REPLACE) {
 			await sendReplaceModeMessage(message, fullMessage, embeds);
 		}
-		else if (mode == EmbedMode.REPLY) {
+		else if (mode == Mode.REPLY) {
 			await sendReplyModeMessage(message, links, embeds);
 		}
-		else if (mode == EmbedMode.ASK) {
+		else if (mode == Mode.ASK) {
 			await sendAskModeMessage(message, links, embeds);
 		}
 	}
@@ -148,8 +148,8 @@ async function handleMessageLink(message) {
 
 module.exports = {
 	handleContextMenuLink,
-    handleContextMenuArchive,
+	handleContextMenuArchive,
 	handleSlashCommandLink,
-    handleSlashCommandArchive,
+	handleSlashCommandArchive,
 	handleMessageLink,
 };
