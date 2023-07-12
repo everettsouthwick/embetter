@@ -27,6 +27,7 @@ function getPlatform(message, guildProfile) {
 	return null;
 }
 
+
 function replaceLink(message, platform) {
 	const originalUrl = message.match(platform.pattern)[0];
 	let newMessage = message;
@@ -40,33 +41,30 @@ function replaceLink(message, platform) {
 	return { newMessage, originalUrl, newUrl };
 }
 
-async function handleEmbed(platform, originalUrl, newUrl) {
-	let embed = null;
+async function handleEmbeds(platform, originalUrl, newUrl) {
+	let embeds = [];
 	if (platform.embed) {
 		try {
-			embed = await buildEmbed(platform, originalUrl, newUrl);
+			embeds = await buildEmbed(platform, originalUrl, newUrl);
 		}
 		catch (error) {
 			console.error('Error building embed for', platform.name, ':', error);
 		}
 	}
-	return embed;
+	return embeds;
 }
 
 async function processLink(message, guildProfile) {
 	let newMessage = message;
 	const links = [];
-	const embeds = [];
+	let embeds = [];
 
 	const platform = getPlatform(message, guildProfile);
 	if (platform) {
 		const replacementResult = replaceLink(message, platform);
 		newMessage = replacementResult.newMessage;
-		const embed = await handleEmbed(platform, replacementResult.originalUrl, replacementResult.newUrl);
-		if (embed) {
-			embeds.push(embed);
-		}
-		else {
+		embeds = await handleEmbeds(platform, replacementResult.originalUrl, replacementResult.newUrl);
+		if (!embeds.length === 0) {
 			links.push(replacementResult.newUrl);
 		}
 	}
@@ -76,7 +74,7 @@ async function processLink(message, guildProfile) {
 
 async function processArchive(link) {
 	const links = [];
-	const embeds = [];
+	let embeds = [];
 
 	if (!isValidUrl(link)) {
 		return { links: links, embeds: embeds };
@@ -90,11 +88,9 @@ async function processArchive(link) {
 	};
 
 	const newUrl = platform.replacement(strippedLink);
-	let embed;
 
 	try {
-		embed = await buildEmbed(platform, strippedLink, newUrl);
-		embeds.push(embed);
+		embeds = await buildEmbed(platform, strippedLink, newUrl);
 	}
 	catch (error) {
 		console.error('Error building embed for', platform.name, ':', error);
