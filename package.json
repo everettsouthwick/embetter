@@ -15,8 +15,7 @@
     "discord.js": "^14.11.0",
     "mongodb": "^5.7.0",
     "node-fetch": "2",
-    "open-graph-scraper": "^6.2.1",
-    "sqlite3": "^5.1.6"
+    "open-graph-scraper": "^6.2.1"
   },
   "devDependencies": {
     "eslint": "^8.44.0"
