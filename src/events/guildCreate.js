@@ -1,11 +1,11 @@
 const { Events } = require('discord.js');
-const EmbedMode = require('../utils/embedMode.js');
+const { Mode } = require('../models/mode.js');
 const { setGuildMode } = require('../utils/db.js');
 
 
 module.exports = {
 	name: Events.GuildCreate,
 	execute(guild) {
-		setGuildMode(guild.id, EmbedMode.REPLY);
+		setGuildMode(guild.id, Mode.ASK);
 	},
 };

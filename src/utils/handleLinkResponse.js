@@ -1,15 +1,15 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const replaceLink = require('./handleLink.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { processArchive, processLink } = require('./handleLink.js');
 const { getGuildMode } = require('./db.js');
-const EmbedMode = require('./embedMode.js');
+const { Mode } = require('../models/mode.js');
 
 async function sendReplaceModeMessage(message, fullMessage, embeds) {
 	await message.delete();
 	if (embeds.length > 0) {
-		await message.channel.send({ content:`${message.author}: ${fullMessage}`, embeds: embeds });
+		await message.channel.send({ content: `${message.author}: ${fullMessage}`, embeds: embeds });
 	}
 	else {
-		await message.channel.send({ content:`${message.author}: ${fullMessage}` });
+		await message.channel.send({ content: `${message.author}: ${fullMessage}` });
 	}
 
 }
@@ -18,7 +18,7 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	const isInteraction = messageOrInteraction.commandId ? true : false;
 
 	const confirm = new ButtonBuilder()
-		.setCustomId('confirm')
+		.setCustomId('keep')
 		.setLabel('Keep')
 		.setStyle(ButtonStyle.Primary);
 
@@ -35,33 +35,59 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 		response = await messageOrInteraction.reply({ embeds: embeds, components: [row] });
 	}
 	else {
-		response = await messageOrInteraction.reply({ content: links.join('\n'), components: [row] });
+		response = await messageOrInteraction.reply({ content: links.join('\n') });
 	}
 
-	const collectorFilter = i => i.user.id === (isInteraction ? messageOrInteraction.user.id : messageOrInteraction.author.id);
-
-	try {
-		const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
-
-		await confirmation.update({ components: [] });
-
-		if (confirmation.customId === 'delete') {
+	if (!isInteraction) {
+		try {
+			await checkForEmbed(response);
+			await response.edit({ components: [row] });
+		}
+		catch {
 			await response.delete();
 		}
 	}
-	catch (e) {
-		await response.edit({ components: [] });
-	}
+
+	const collector = await response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+
+	collector.on('collect', async i => {
+		if (i.customId === 'keep') {
+			if (!isInteraction) {
+				await messageOrInteraction.suppressEmbeds(true);
+			}
+
+			await collector.stop();
+			await response.edit({ components: [] });
+		}
+		else if (i.customId === 'delete') {
+			const userId = isInteraction ? messageOrInteraction.user.id : messageOrInteraction.author.id;
+			if (i.user.id === userId) {
+				await collector.stop();
+				await response.delete();
+			} else {
+				await i.reply({ content: 'Only the original author can choose to delete this message.', ephemeral: true });
+			}
+		}
+	});
+
+	collector.on('end', async () => {
+		try {
+			await response.edit({ components: [] });
+		}
+		catch {
+			// Do nothing
+		}
+	});
 }
 
-async function sendManualModeMessage(message, links, embeds) {
+async function sendAskModeMessage(message, links, embeds) {
 	const confirm = new ButtonBuilder()
-		.setCustomId('confirm')
+		.setCustomId('yes')
 		.setLabel('Yes')
 		.setStyle(ButtonStyle.Primary);
 
 	const cancel = new ButtonBuilder()
-		.setCustomId('cancel')
+		.setCustomId('no')
 		.setLabel('No')
 		.setStyle(ButtonStyle.Secondary);
 
@@ -70,30 +96,59 @@ async function sendManualModeMessage(message, links, embeds) {
 
 	const response = await message.reply({ content: 'Would you like to embed this link?', components: [row] });
 
-	const collectorFilter = i => i.user.id === message.author.id;
+	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
-	try {
-		const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
-		if (confirmation.customId === 'confirm') {
-			await confirmation.update({ components: [] });
+	collector.on('collect', async i => {
+		if (i.customId === 'yes') {
 			await response.delete();
 			await sendReplyModeMessage(message, links, embeds);
 		}
-		else if (confirmation.customId === 'cancel') {
-			await confirmation.update({ components: [] });
-			await response.delete();
+		else if (i.customId === 'no') {
+			if (i.user.id === message.author.id) {
+				await response.delete();
+			} else {
+				await i.reply({ content: 'Only the original author can choose not to embed.', ephemeral: true });
+			}
 		}
-	}
-	catch (e) {
-		await response.edit({ components: [] });
+	});
+
+	collector.on('end', async () => {
 		await response.delete();
+	});
+}
+
+async function checkForEmbed(message) {
+	const startTime = Date.now();
+
+	return new Promise((resolve, reject) => {
+		const embedCheck = setInterval(() => {
+			if (message.embeds.length > 0) {
+				clearInterval(embedCheck);
+				resolve(true);
+			}
+			else if (Date.now() - startTime > 5000) {
+				clearInterval(embedCheck);
+				reject(false);
+			}
+		}, 200);
+	});
+}
+
+
+async function handleContextMenuLink(interaction) {
+	const { links, embeds } = await processLink(interaction.targetMessage.content);
+	if (links.length > 0 || embeds.length > 0) {
+		await sendReplyModeMessage(interaction, links, embeds);
+	}
+	else {
+		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
 	}
 }
 
-async function handleContextMenuLink(interaction) {
-	const { links, embeds } = await replaceLink(interaction.targetMessage.content);
-	if (links.length > 0 || embeds.length > 0) {
-		sendReplyModeMessage(interaction, links, embeds);
+async function handleContextMenuArchive(interaction) {
+	const { links, embeds } = await processArchive(interaction.targetMessage.content);
+	if (embeds.length > 0) {
+		await sendReplyModeMessage(interaction, links, embeds);
 	}
 	else {
 		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
@@ -101,9 +156,19 @@ async function handleContextMenuLink(interaction) {
 }
 
 async function handleSlashCommandLink(interaction) {
-	const { links, embeds } = await replaceLink(interaction.options.getString('link'));
+	const { links, embeds } = await processLink(interaction.options.getString('link'));
 	if (links.length > 0 || embeds.length > 0) {
-		sendReplyModeMessage(interaction, links, embeds);
+		await sendReplyModeMessage(interaction, links, embeds);
+	}
+	else {
+		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
+	}
+}
+
+async function handleSlashCommandArchive(interaction) {
+	const { links, embeds } = await processArchive(interaction.options.getString('link'));
+	if (embeds.length > 0) {
+		await sendReplyModeMessage(interaction, links, embeds);
 	}
 	else {
 		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
@@ -111,23 +176,25 @@ async function handleSlashCommandLink(interaction) {
 }
 
 async function handleMessageLink(message) {
-	const { fullMessage, links, embeds } = await replaceLink(message.content);
+	const { fullMessage, links, embeds } = await processLink(message.content);
 	if (links.length > 0 || embeds.length > 0) {
 		const mode = await getGuildMode(message.guild.id);
-		if (mode == EmbedMode.REPLACE) {
+		if (mode == Mode.REPLACE) {
 			await sendReplaceModeMessage(message, fullMessage, embeds);
 		}
-		else if (mode == EmbedMode.REPLY) {
+		else if (mode == Mode.REPLY) {
 			await sendReplyModeMessage(message, links, embeds);
 		}
-		else {
-			await sendManualModeMessage(message, links, embeds);
+		else if (mode == Mode.ASK) {
+			await sendAskModeMessage(message, links, embeds);
 		}
 	}
 }
 
 module.exports = {
 	handleContextMenuLink,
+	handleContextMenuArchive,
 	handleSlashCommandLink,
+	handleSlashCommandArchive,
 	handleMessageLink,
 };
