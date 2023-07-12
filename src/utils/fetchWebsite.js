@@ -44,9 +44,9 @@ async function parseHtml(url) {
 	let browser;
 
 	try {
-		const browser = await puppeteer.launch({
+		browser = await puppeteer.launch({
 			headless: 'new',
-			args: ['--no-sandbox', '--disable-setuid-sandbox']
+			args: ['--no-sandbox', '--disable-setuid-sandbox'],
 		});
 		const page = await browser.newPage();
 
@@ -59,24 +59,25 @@ async function parseHtml(url) {
 			const elements = await page.$x(xpath);
 			if (elements.length > 0) {
 				return elements[0];
-			} else {
+			}
+			else {
 				throw new Error(`No element found for XPath: ${xpath}`);
 			}
 		}
 
 		const thread = await getElementByXpath(page, '/html/body/div[2]/div/div/div[2]/div/div/div/div/div[1]/div[2]/div[1]/div/div');
 
-		const links = await thread.$$eval('a[role="link"]', links => links.map(link => ({ href: link.href, text: link.innerText })));
-		const images = await thread.$$eval('img', imgs => imgs.map(img => img.src));
+		const links = await thread.$$eval('a[role="link"]', (links) => links.map((link) => ({ href: link.href, text: link.innerText })));
+		const images = await thread.$$eval('img', (imgs) => imgs.map((img) => img.src));
 
 		const ogUrl = links[0].href;
 		const ogTitle = `@${links[1].text}`;
-		const ogDescription = await thread.$eval('p span', span => span.innerText);
+		const ogDescription = await thread.$eval('p span', (span) => span.innerText);
 		const thumbnail = images[0];
 		const ogImage = images[1] ?? null;
-		const ogDate = await thread.$eval('time', time => time.dateTime);
+		const ogDate = await thread.$eval('time', (time) => time.dateTime);
 		const replies = links[links.length - 1].text;
-		const likes = await thread.$eval('div[role="button"] span', span => span.innerText);
+		const likes = await thread.$eval('div[role="button"] span', (span) => span.innerText);
 
 		return {
 			ogSiteName: 'Threads',
@@ -86,7 +87,7 @@ async function parseHtml(url) {
 			ogDescription: `${ogDescription}\n\n:speech_balloon: ${replies.split(' ')[0]} :heart: ${likes.split(' ')[0]}`,
 			ogImage: ogImage ? [{ url: ogImage }] : null,
 			thumbnail,
-			ogDate
+			ogDate,
 		};
 	}
 	catch (error) {

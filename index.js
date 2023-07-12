@@ -3,11 +3,13 @@ const path = require('node:path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [
-	GatewayIntentBits.MessageContent,
-	GatewayIntentBits.Guilds,
-	GatewayIntentBits.GuildMessages,
-] });
+const client = new Client({
+	intents: [
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+	],
+});
 
 client.commands = new Collection();
 
@@ -44,5 +46,17 @@ function loadItems(dir, type) {
 // Start recursion from root directories
 loadItems(path.join(__dirname, 'src/commands'), 'commands');
 loadItems(path.join(__dirname, 'src/events'), 'events');
+
+// Instantiate services
+const getRepositories = require('./src/utils/getRepositories');
+const GuildProfileService = require('./src/services/GuildProfileService');
+let guildProfileService;
+
+getRepositories()
+	.then((repositories) => {
+		guildProfileService = new GuildProfileService(repositories.guildProfileRepository);
+		client.guildProfileService = guildProfileService;
+	})
+	.catch(console.error);
 
 client.login(token);
