@@ -9,12 +9,12 @@ async function fetchWebsiteDetails(url) {
 		let options;
 		if (url.includes('threads.net')) {
 			try {
-				return await parseThreadsData(url);
+				return await parseHtml(url);
 			}
 			catch {
 				// Do nothing
 			}
-			const html = await fetchRawHtml(url);
+			const html = await fetchHtml(url);
 			options = { html };
 		}
 		else {
@@ -26,9 +26,6 @@ async function fetchWebsiteDetails(url) {
 		if (error) {
 			throw error;
 		}
-		if (!result.success) {
-			throw new Error('No Open Graph data found');
-		}
 
 		return result;
 	}
@@ -38,38 +35,49 @@ async function fetchWebsiteDetails(url) {
 	}
 }
 
-async function fetchRawHtml(url) {
+async function fetchHtml(url) {
 	const response = await fetch(url);
 	return await response.text();
 }
 
-async function parseThreadsData(url) {
+async function parseHtml(url) {
 	let browser;
 
 	try {
-		const browser = await puppeteer.launch({
+		browser = await puppeteer.launch({
 			headless: 'new',
 			args: ['--no-sandbox', '--disable-setuid-sandbox'],
 		});
-
 		const page = await browser.newPage();
 
+		// Go to the specified URL
 		await page.goto(url, { waitUntil: 'domcontentloaded' });
-		await page.waitForSelector('div.x11ql9d');
 
-		const post = await page.$('div.x11ql9d');
+		await page.waitForSelector('img.xl1xv1r.x14yjl9h.xudhj91.x18nykt9.xww2gxu');
 
-		const links = await post.$$eval('a[role="link"]', (a) => a.map((link) => ({ href: link.href, text: link.innerText })));
-		const images = await post.$$eval('img', (imgs) => imgs.map((img) => img.src));
+		async function getElementByXpath(page, xpath) {
+			const elements = await page.$x(xpath);
+			if (elements.length > 0) {
+				return elements[0];
+			}
+			else {
+				throw new Error(`No element found for XPath: ${xpath}`);
+			}
+		}
+
+		const thread = await getElementByXpath(page, '/html/body/div[2]/div/div/div[2]/div/div/div/div/div[1]/div[2]/div[1]/div/div');
+
+		const links = await thread.$$eval('a[role="link"]', (links) => links.map((link) => ({ href: link.href, text: link.innerText })));
+		const images = await thread.$$eval('img', (imgs) => imgs.map((img) => img.src));
 
 		const ogUrl = links[0].href;
 		const ogTitle = `@${links[1].text}`;
-		const ogDescription = await post.$eval('p span', (span) => span.innerText);
+		const ogDescription = await thread.$eval('p span', (span) => span.innerText);
 		const thumbnail = images[0];
-		const ogImage = images.slice(1).map(img => ({ url: img })) ?? null;
-		const ogDate = await post.$eval('time', (time) => time.dateTime);
+		const ogImage = images[1] ?? null;
+		const ogDate = await thread.$eval('time', (time) => time.dateTime);
 		const replies = links[links.length - 1].text;
-		const likes = await post.$eval('div[role="button"] span', (span) => span.innerText);
+		const likes = await thread.$eval('div[role="button"] span', (span) => span.innerText);
 
 		return {
 			ogSiteName: 'Threads',
@@ -77,7 +85,7 @@ async function parseThreadsData(url) {
 			favicon: 'https://static.xx.fbcdn.net/rsrc.php/v3/yV/r/_8T3PbCSTRI.png',
 			ogTitle,
 			ogDescription: `${ogDescription}\n\n:speech_balloon: ${replies.split(' ')[0]} :heart: ${likes.split(' ')[0]}`,
-			ogImage,
+			ogImage: ogImage ? [{ url: ogImage }] : null,
 			thumbnail,
 			ogDate,
 		};

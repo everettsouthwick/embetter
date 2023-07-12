@@ -5,7 +5,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('embed')
 		.setDescription('Attempts to embed the provided link(s).')
-		.addStringOption(option => option
+		.addStringOption((option) => option
 			.setName('link')
 			.setDescription('Space separated list of link(s) to embed.')
 			.setRequired(true)),

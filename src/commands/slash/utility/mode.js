@@ -1,18 +1,16 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const { Mode } = require('../../../models/mode.js');
-const { GuildProfile } = require('../../../models/guildProfile.js');
-const { getRepositories } = require('../../../utils/db.js');
-
+const { Mode } = require('../../../models/Mode.js');
+const { GuildProfile } = require('../../../models/GuildProfile.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('mode')
 		.setDescription('Configure the embed mode.')
-		.addSubcommand(subcommand =>
+		.addSubcommand((subcommand) =>
 			subcommand
 				.setName('set')
 				.setDescription('Sets the mode for embeds. By default, this is set to ask.')
-				.addIntegerOption(option => option
+				.addIntegerOption((option) => option
 					.setName('mode')
 					.setDescription('Replace: Delete and resend, Reply: Keep and send, Ask: Ask the user.')
 					.setRequired(true)
@@ -25,20 +23,21 @@ module.exports = {
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 		.setDMPermission(false),
 	async execute(interaction) {
-		if (interaction.options.getSubcommand() === 'set') {
-			const repositories = getRepositories();
-			const guildRepository = repositories.guildRepository;
+		const guildProfileService = interaction.client.guildProfileService;
 
-			let guildProfile = await guildRepository.getGuildProfile(interaction.guild.id);
+		if (interaction.options.getSubcommand() === 'set') {
+			const mode = interaction.options.getInteger('mode');
+
+			let guildProfile = await guildProfileService.getGuildProfile(interaction.guild.id);
 			if (guildProfile) {
-				guildProfile.mode = interaction.options.getInteger('mode');
+				guildProfile.mode = mode;
 			}
 			else {
-				guildProfile = new GuildProfile(interaction.guild.id, interaction.options.getInteger('mode'), {});
+				guildProfile = new GuildProfile(interaction.guild.id, mode, {});
 			}
 
-			await guildRepository.setGuildProfile(guildProfile);
-			await interaction.reply({ content: `The mode has been set to ${Mode.getModeName(interaction.options.getInteger('mode'))}.`, ephemeral: true });
+			await guildProfileService.upsertGuildProfile(guildProfile);
+			await interaction.reply({ content: `The mode has been set to ${Mode.getModeName(mode)}.`, ephemeral: true });
 		}
 	},
 };

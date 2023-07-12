@@ -43,9 +43,9 @@ const allCommands = [...slashCommands, ...contextCommands];
 (async () => {
 	try {
 		console.log(`Started refreshing ${slashCommands.length} application (/) commands and ${contextCommands.length} context commands.`);
-		const route = process.argv[2] === 'develop'
-			? Routes.applicationGuildCommands(clientId, guildId)
-			: Routes.applicationCommands(clientId);
+		const route = process.argv[2] === 'develop' ?
+			Routes.applicationGuildCommands(clientId, guildId) :
+			Routes.applicationCommands(clientId);
 		const responseData = await rest.put(route, { body: allCommands });
 		console.log(`Successfully reloaded ${responseData.length} application (/) commands and context commands.`);
 	}
