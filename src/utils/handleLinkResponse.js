@@ -38,19 +38,24 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 		response = await messageOrInteraction.reply({ content: links.join('\n') });
 	}
 
-	try {
-		await checkForEmbed(response);
-		await response.edit({ components: [row] });
-	}
-	catch {
-		await response.delete();
+	if (!isInteraction) {
+		try {
+			await checkForEmbed(response);
+			await response.edit({ components: [row] });
+		}
+		catch {
+			await response.delete();
+		}
 	}
 
 	const collector = await response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
 	collector.on('collect', async i => {
 		if (i.customId === 'keep') {
-			await messageOrInteraction.suppressEmbeds(true);
+			if (!isInteraction) {
+				await messageOrInteraction.suppressEmbeds(true);
+			}
+
 			await collector.stop();
 			await response.edit({ components: [] });
 		}
@@ -66,7 +71,12 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	});
 
 	collector.on('end', async () => {
-		await response.edit({ components: [] });
+		try {
+			await response.edit({ components: [] });
+		}
+		catch {
+			// Do nothing
+		}
 	});
 }
 
