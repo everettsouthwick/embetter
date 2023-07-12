@@ -2,5 +2,6 @@
     "token": "",
     "clientId": "",
     "guildId": "",
-    "commandId": ""
+    "commandId": "",
+    "mongoDbUri": ""
 }
