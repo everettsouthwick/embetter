@@ -4,14 +4,21 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-ENV _CHROMEDRIVER_PATH="/usr/bin/chromedriver"
+RUN apk add --no-cache \
+      chromium \
+      nss \
+      freetype \
+      harfbuzz \
+      ca-certificates \
+      ttf-freefont \
+      yarn
 
-RUN apk add --update --no-cache chromium chromium-chromedriver
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 COPY ["package.json", "package-lock.json*", "./"]
 
-RUN npm install --omit=dev
+RUN yarn install --production=true
 
 COPY . .
 
-CMD ["node", "index.js"]
+CMD ["yarn", "start"]
