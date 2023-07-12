@@ -8,7 +8,7 @@ function isValidUrl(string) {
         new URL(string);
         return true;
     } catch (_) {
-        return false;  
+        return false;
     }
 }
 
@@ -28,11 +28,17 @@ function getPlatform(message) {
 
 function replaceLink(message, platform) {
     const originalUrl = message.match(platform.pattern)[0];
-    const newMessage = message.replace(platform.pattern, platform.replacement);
-    const newUrl = platform.replacement(originalUrl);
+    let newMessage = message;
+    let newUrl = originalUrl;
 
-    return {newMessage, originalUrl, newUrl};
+    if (platform.replacement) {
+        newMessage = message.replace(platform.pattern, platform.replacement);
+        newUrl = platform.replacement(originalUrl);
+    }
+
+    return { newMessage, originalUrl, newUrl };
 }
+
 
 async function handleEmbed(platform, originalUrl, newUrl) {
     let embed = null;
@@ -72,7 +78,7 @@ async function processArchive(link) {
     const embeds = [];
 
     if (!isValidUrl(link)) {
-        throw new Error('Invalid URL');
+        return { links: links, embeds: embeds };
     }
 
     const strippedLink = stripQueryString(link);
@@ -81,7 +87,7 @@ async function processArchive(link) {
         pattern: new RegExp(`(${strippedLink})`, 'g'),
         replacement: (url) => `https://archive.today/newest/${url}`
     };
-    
+
     const newUrl = platform.replacement(strippedLink);
     let embed;
 
@@ -92,7 +98,7 @@ async function processArchive(link) {
     catch (error) {
         console.error('Error building embed for', platform.name, ':', error);
     }
-    
+
     return { links: links, embeds: embeds };
 }
 
