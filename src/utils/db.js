@@ -1,51 +1,46 @@
-const sqlite3 = require('sqlite3').verbose();
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const { mongoDbUri } = require('../../config.json');
+const { GuildProfile } = require('../models/guildProfile.js');
 
-const db = new sqlite3.Database('./embetter.db', (err) => {
-	if (err) {
-		return console.error(err.message);
+const client = new MongoClient(mongoDbUri, {
+	serverApi: {
+		version: ServerApiVersion.v1,
+		strict: true,
+		deprecationErrors: true,
 	}
-	console.log('Connected to the SQlite database.');
 });
 
-db.run(`CREATE TABLE IF NOT EXISTS guild_modes (
-    guild_id TEXT PRIMARY KEY,
-    mode INTEGER
-)`, (err) => {
-	if (err) {
-		return console.error(err.message);
+let db;
+
+class GuildRepository {
+	constructor(db) {
+		this.collection = db.collection('guilds');
 	}
-	console.log('Guild modes table created.');
-});
 
-function setGuildMode(guild_id, mode) {
-	return new Promise((resolve, reject) => {
-		db.run('REPLACE INTO guild_modes (guild_id, mode) VALUES (?, ?)', [guild_id, mode], (err) => {
-			if (err) {
-				console.error(err.message);
-				reject(err);
-			}
-			else {
-				console.log(`Mode ${mode} set for guild ${guild_id}.`);
-				resolve();
-			}
-		});
-	});
+	async setGuildProfile(guild) {
+		return this.collection.updateOne({ _id: guild.id }, { $set: guild }, { upsert: true });
+	}
+
+	async getGuildProfile(guild_id) {
+		const guildData = await this.collection.findOne({ _id: guild_id });
+		if (!guildData) return null;
+		return new GuildProfile(guildData._id, guildData.mode, guildData.platforms);
+	}
 }
 
-function getGuildMode(guild_id) {
-	return new Promise((resolve, reject) => {
-		db.get('SELECT mode FROM guild_modes WHERE guild_id = ?', [guild_id], (err, row) => {
-			if (err) {
-				console.error(err.message);
-				reject(err);
-			}
-			else {
-				// If no results were found, row will be `undefined`, and mode will be `null`.
-				const mode = row ? row.mode : null;
-				resolve(mode);
-			}
-		});
-	});
+async function run() {
+	try {
+		await client.connect();
+		db = client.db("embetter");
+	} catch (err) {
+		console.error(err);
+	}
 }
 
-module.exports = { setGuildMode, getGuildMode };
+run().catch(console.dir);
+
+module.exports = {
+	getRepositories: () => ({
+		guildRepository: new GuildRepository(db),
+	}),
+};

@@ -1,6 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { processArchive, processLink } = require('./handleLink.js');
-const { getGuildMode } = require('./db.js');
+const { getRepositories } = require('./db.js');
 const { Mode } = require('../models/mode.js');
 
 async function sendReplaceModeMessage(message, fullMessage, embeds) {
@@ -113,7 +113,12 @@ async function sendAskModeMessage(message, links, embeds) {
 	});
 
 	collector.on('end', async () => {
-		await response.delete();
+		try {
+			await response.delete();
+		}
+		catch {
+			// Do nothing
+		}
 	});
 }
 
@@ -176,16 +181,21 @@ async function handleSlashCommandArchive(interaction) {
 }
 
 async function handleMessageLink(message) {
-	const { fullMessage, links, embeds } = await processLink(message.content);
+	const repositories = getRepositories();
+	const guildRepository = repositories.guildRepository;
+
+	const guildProfile = await guildRepository.getGuildProfile(message.guild.id);
+
+	const { fullMessage, links, embeds } = await processLink(message.content, guildProfile);
 	if (links.length > 0 || embeds.length > 0) {
-		const mode = await getGuildMode(message.guild.id);
-		if (mode == Mode.REPLACE) {
+
+		if (guildProfile?.mode == Mode.REPLACE) {
 			await sendReplaceModeMessage(message, fullMessage, embeds);
 		}
-		else if (mode == Mode.REPLY) {
+		else if (guildProfile?.mode == Mode.REPLY) {
 			await sendReplyModeMessage(message, links, embeds);
 		}
-		else if (mode == Mode.ASK) {
+		else if (guildProfile?.mode == Mode.ASK) {
 			await sendAskModeMessage(message, links, embeds);
 		}
 	}
