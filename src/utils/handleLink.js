@@ -1,5 +1,5 @@
 const platforms = require('../constants/platforms.js');
-const { buildEmbed } = require('./buildEmbed.js');
+const { buildEmbeds } = require('./buildEmbeds.js');
 
 function isValidUrl(string) {
 	try {
@@ -45,7 +45,7 @@ async function handleEmbeds(platform, originalUrl, newUrl) {
 	let embeds = [];
 	if (platform.embed) {
 		try {
-			embeds = await buildEmbed(platform, originalUrl, newUrl);
+			embeds = await buildEmbeds(platform, originalUrl, newUrl);
 		}
 		catch (error) {
 			console.error('Error building embed for', platform.name, ':', error);
@@ -64,9 +64,7 @@ async function processLink(message, guildProfile) {
 		const replacementResult = replaceLink(message, platform);
 		newMessage = replacementResult.newMessage;
 		embeds = await handleEmbeds(platform, replacementResult.originalUrl, replacementResult.newUrl);
-		if (!embeds.length === 0) {
-			links.push(replacementResult.newUrl);
-		}
+		links.push(replacementResult.newUrl);
 	}
 
 	return { fullMessage: newMessage, links: links, embeds: embeds };
@@ -90,7 +88,7 @@ async function processArchive(link) {
 	const newUrl = platform.replacement(strippedLink);
 
 	try {
-		embeds = await buildEmbed(platform, strippedLink, newUrl);
+		embeds = await buildEmbeds(platform, strippedLink, newUrl);
 	}
 	catch (error) {
 		console.error('Error building embed for', platform.name, ':', error);

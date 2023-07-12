@@ -71,12 +71,23 @@ async function parseThreadsData(url) {
 		const replies = links[links.length - 1].text;
 		const likes = await post.$eval('div[role="button"] span', (span) => span.innerText);
 
+		let repliesCount = 0;
+		let likesCount = 0;
+		if (replies && replies.includes('replies')) {
+			repliesCount = parseInt(replies.split(' ')[0].replace(',', '')) || 0;
+		}
+		if (likes && likes.includes('likes')) {
+			likesCount = parseInt(likes.split(' ')[0].replace(',', '')) || 0;
+		}
+
+		const engagementStats = `:speech_balloon: ${repliesCount.toLocaleString()} :heart: ${likesCount.toLocaleString()}`;
+
 		return {
 			ogSiteName: 'Threads',
 			ogUrl,
 			favicon: 'https://static.xx.fbcdn.net/rsrc.php/v3/yV/r/_8T3PbCSTRI.png',
 			ogTitle,
-			ogDescription: `${ogDescription}\n\n:speech_balloon: ${replies.split(' ')[0]} :heart: ${likes.split(' ')[0]}`,
+			ogDescription: `${ogDescription}\n\n${engagementStats}`,
 			ogImage,
 			thumbnail,
 			ogDate,
