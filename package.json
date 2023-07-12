@@ -12,6 +12,7 @@
   "author": "Everett Southwick <everett@southwick.dev>",
   "license": "GPL-3.0",
   "dependencies": {
+    "axios": "^1.4.0",
     "discord.js": "^14.11.0",
     "mongodb": "^5.7.0",
     "node-fetch": "2",
