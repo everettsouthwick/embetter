@@ -32,6 +32,7 @@ async function buildEmbed(platform, originalUrl, newUrl) {
 			.setURL(newUrl || null)
 			.setDescription(data.ogDescription || data.twitterDescription || null)
 			.setImage(data.ogImage?.length > 0 ? data.ogImage[0]?.url : null || data.twitterImage?.length > 0 ? data.twitterImage[0]?.url : null || null)
+			.setThumbnail(data.thumbnail || null)
 			.setColor('#0a84ff')
 			.setTimestamp(new Date(data.ogDate || data.articleModifiedTime || data.articlePublishedTime || Date.now()) || null);
 		return embed;
