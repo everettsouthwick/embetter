@@ -14,11 +14,11 @@ async function buildEmbed(platform, originalUrl, newUrl) {
 			data.favicon = base.origin + data.favicon;
 		}
 
-		if (data.ogImage[0]?.url?.startsWith('/')) {
+		if (data.ogImage?.length > 0 && data.ogImage[0]?.url?.startsWith('/')) {
 			data.ogImage[0].url = base.origin + data.ogImage[0].url;
 		}
 
-		if (data.twitterImage[0]?.url?.startsWith('/')) {
+		if (data.twitterImage?.length > 0 && data.twitterImage[0]?.url?.startsWith('/')) {
 			data.twitterImage[0].url = base.origin + data.twitterImage[0].url;
 		}
 
@@ -31,7 +31,7 @@ async function buildEmbed(platform, originalUrl, newUrl) {
 			.setTitle(data.ogTitle || data.twitterTitle || platform.name || null)
 			.setURL(newUrl || null)
 			.setDescription(data.ogDescription || data.twitterDescription || null)
-			.setImage(data.ogImage[0]?.url || data.twitterImage[0]?.url || null)
+			.setImage(data.ogImage?.length > 0 ? data.ogImage[0]?.url : null || data.twitterImage?.length > 0 ? data.twitterImage[0]?.url : null || null)
 			.setTimestamp(new Date(data.ogDate || data.articleModifiedTime || data.articlePublishedTime || Date.now()) || null);
 		return embed;
 	}
