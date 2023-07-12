@@ -1,7 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { processArchive, processLink } = require('./handleLink.js');
-const { getRepositories } = require('./db.js');
-const { Mode } = require('../models/mode.js');
+const { Mode } = require('../models/Mode.js');
 
 async function sendReplaceModeMessage(message, fullMessage, embeds) {
 	await message.delete();
@@ -11,7 +10,6 @@ async function sendReplaceModeMessage(message, fullMessage, embeds) {
 	else {
 		await message.channel.send({ content: `${message.author}: ${fullMessage}` });
 	}
-
 }
 
 async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
@@ -50,7 +48,7 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 
 	const collector = await response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
-	collector.on('collect', async i => {
+	collector.on('collect', async (i) => {
 		if (i.customId === 'keep') {
 			if (!isInteraction) {
 				await messageOrInteraction.suppressEmbeds(true);
@@ -64,7 +62,8 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 			if (i.user.id === userId) {
 				await collector.stop();
 				await response.delete();
-			} else {
+			}
+			else {
 				await i.reply({ content: 'Only the original author can choose to delete this message.', ephemeral: true });
 			}
 		}
@@ -98,7 +97,7 @@ async function sendAskModeMessage(message, links, embeds) {
 
 	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
-	collector.on('collect', async i => {
+	collector.on('collect', async (i) => {
 		if (i.customId === 'yes') {
 			await response.delete();
 			await sendReplyModeMessage(message, links, embeds);
@@ -106,7 +105,8 @@ async function sendAskModeMessage(message, links, embeds) {
 		else if (i.customId === 'no') {
 			if (i.user.id === message.author.id) {
 				await response.delete();
-			} else {
+			}
+			else {
 				await i.reply({ content: 'Only the original author can choose not to embed.', ephemeral: true });
 			}
 		}
@@ -181,14 +181,11 @@ async function handleSlashCommandArchive(interaction) {
 }
 
 async function handleMessageLink(message) {
-	const repositories = getRepositories();
-	const guildRepository = repositories.guildRepository;
-
-	const guildProfile = await guildRepository.getGuildProfile(message.guild.id);
+	const guildProfileService = message.client.guildProfileService;
+	const guildProfile = await guildProfileService.getGuildProfile(message.guild.id);
 
 	const { fullMessage, links, embeds } = await processLink(message.content, guildProfile);
 	if (links.length > 0 || embeds.length > 0) {
-
 		if (guildProfile?.mode == Mode.REPLACE) {
 			await sendReplaceModeMessage(message, fullMessage, embeds);
 		}
