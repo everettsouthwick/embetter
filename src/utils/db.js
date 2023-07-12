@@ -1,34 +1,46 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const { mongoDbUri } = require('../../config.json')
+const { mongoDbUri } = require('../../config.json');
+const { GuildProfile } = require('../models/guildProfile.js');
 
 const client = new MongoClient(mongoDbUri, {
 	serverApi: {
-	  version: ServerApiVersion.v1,
-	  strict: true,
-	  deprecationErrors: true,
+		version: ServerApiVersion.v1,
+		strict: true,
+		deprecationErrors: true,
 	}
 });
 
 let db;
 
+class GuildRepository {
+	constructor(db) {
+		this.collection = db.collection('guilds');
+	}
+
+	async setGuildProfile(guild) {
+		return this.collection.updateOne({ _id: guild.id }, { $set: guild }, { upsert: true });
+	}
+
+	async getGuildProfile(guild_id) {
+		const guildData = await this.collection.findOne({ _id: guild_id });
+		if (!guildData) return null;
+		return new GuildProfile(guildData._id, guildData.mode, guildData.platforms);
+	}
+}
+
 async function run() {
 	try {
-	  await client.connect();
-      db = client.db("embetter");
+		await client.connect();
+		db = client.db("embetter");
 	} catch (err) {
 		console.error(err);
 	}
 }
+
 run().catch(console.dir);
 
-async function setGuildMode(guild_id, mode) {
-  const collection = db.collection('guild_modes');
-  return collection.updateOne({ _id: guild_id }, { $set: { mode: mode } }, { upsert: true });
-}
-
-async function getGuildMode(guild_id) {
-  const collection = db.collection('guild_modes');
-  return collection.findOne({ _id: guild_id });
-}
-
-module.exports = { setGuildMode, getGuildMode };
+module.exports = {
+	getRepositories: () => ({
+		guildRepository: new GuildRepository(db),
+	}),
+};
