@@ -17,14 +17,18 @@ function stripQueryString(url) {
     return urlObject.origin + urlObject.pathname;
 }
 
-function getPlatform(message) {
+function getPlatform(message, guildProfile) {
     for (const platform of platforms) {
         if (platform.pattern.test(message)) {
-            return platform;
+            if (guildProfile?.platforms?.[platform.name] !== false) {
+                return platform;
+            }
         }
     }
     return null;
 }
+
+
 
 function replaceLink(message, platform) {
     const originalUrl = message.match(platform.pattern)[0];
@@ -53,12 +57,12 @@ async function handleEmbed(platform, originalUrl, newUrl) {
     return embed;
 }
 
-async function processLink(message) {
+async function processLink(message, guildProfile) {
     let newMessage = message;
     const links = [];
     const embeds = [];
 
-    const platform = getPlatform(message);
+    const platform = getPlatform(message, guildProfile);
     if (platform) {
         const replacementResult = replaceLink(message, platform);
         newMessage = replacementResult.newMessage;
