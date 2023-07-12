@@ -4,6 +4,10 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
+ENV _CHROMEDRIVER_PATH="/usr/bin/chromedriver"
+
+RUN apk add --update --no-cache chromium chromium-chromedriver
+
 COPY ["package.json", "package-lock.json*", "./"]
 
 RUN npm install --omit=dev
