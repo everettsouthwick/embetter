@@ -3,6 +3,9 @@ const { fetchWebsiteDetails } = require('./fetchWebsite.js');
 
 async function buildEmbed(platform, originalUrl, newUrl) {
 	try {
+		const embeds = [];
+		const addedImageUrls = new Set();
+
 		const data = await fetchWebsiteDetails(originalUrl);
 		const base = new URL(data.ogUrl || data.twitterUrl || data.requestUrl || originalUrl);
 
@@ -22,6 +25,10 @@ async function buildEmbed(platform, originalUrl, newUrl) {
 			data.twitterImage[0].url = base.origin + data.twitterImage[0].url;
 		}
 
+		if (data.ogImage?.length > 1 || data.twitterImage?.length > 1) {
+			data.thumbnail = null;
+		}
+
 		const embed = new EmbedBuilder()
 			.setAuthor({
 				name: data.ogSiteName || data.alAndroidAppName || data.alIphoneAppName || data.twitterAppNameGooglePlay || base.host || platform.name || null,
@@ -35,7 +42,31 @@ async function buildEmbed(platform, originalUrl, newUrl) {
 			.setThumbnail(data.thumbnail || null)
 			.setColor('#0a84ff')
 			.setTimestamp(new Date(data.ogDate || data.articleModifiedTime || data.articlePublishedTime || Date.now()) || null);
-		return embed;
+
+		if (embed.image && embed.image.url) {
+			addedImageUrls.add(embed.image.url);
+		}
+
+		embeds.push(embed);
+
+		const imagesArray = data.ogImage || data.twitterImage || null;
+
+		if (imagesArray?.length > 1) {
+			for (let i = 1; i < imagesArray.length; i++) {
+				const image = imagesArray[i];
+
+				if (image.url && !addedImageUrls.has(image.url)) {
+					addedImageUrls.add(image.url);
+
+					embeds.push(new EmbedBuilder()
+						.setURL(newUrl || null)
+						.setImage(image.url || null),
+					);
+				}
+			}
+		}
+
+		return embeds;
 	}
 	catch (error) {
 		console.error('Error building embed:', error);
@@ -44,5 +75,5 @@ async function buildEmbed(platform, originalUrl, newUrl) {
 }
 
 module.exports = {
-	buildEmbed
-}
+	buildEmbed,
+};

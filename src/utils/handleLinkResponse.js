@@ -64,7 +64,8 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 			if (i.user.id === userId) {
 				await collector.stop();
 				await response.delete();
-			} else {
+			}
+			else {
 				await i.reply({ content: 'Only the original author can choose to delete this message.', ephemeral: true });
 			}
 		}
@@ -106,7 +107,8 @@ async function sendAskModeMessage(message, links, embeds) {
 		else if (i.customId === 'no') {
 			if (i.user.id === message.author.id) {
 				await response.delete();
-			} else {
+			}
+			else {
 				await i.reply({ content: 'Only the original author can choose not to embed.', ephemeral: true });
 			}
 		}

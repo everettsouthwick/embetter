@@ -7,7 +7,7 @@ const client = new MongoClient(mongoDbUri, {
 		version: ServerApiVersion.v1,
 		strict: true,
 		deprecationErrors: true,
-	}
+	},
 });
 
 let db;
@@ -31,8 +31,9 @@ class GuildRepository {
 async function run() {
 	try {
 		await client.connect();
-		db = client.db("embetter");
-	} catch (err) {
+		db = client.db('embetter');
+	}
+	catch (err) {
 		console.error(err);
 	}
 }
