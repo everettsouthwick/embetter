@@ -1,6 +1,7 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder } = require('discord.js');
 const { processArchive, processLink } = require('./handleLink.js');
 const { Mode } = require('../models/Mode.js');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 async function sendReplaceModeMessage(message, fullMessage, embeds) {
 	await message.delete();
@@ -28,13 +29,36 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	const row = new ActionRowBuilder()
 		.addComponents(confirm, cancel);
 
+	let file;
 	let response;
+	const url = 'https://scontent.cdninstagram.com/v/t50.2886-16/359675571_656411129694686_8205107505757813794_n.mp4?_nc_ht=scontent.cdninstagram.com&_nc_cat=102&_nc_ohc=MK_B9btXhGAAX9ykA88&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfDZqwGonBUDGZwYKQ6JGXjFXBSLC7tLgUSy4n22cDxKTA&oe=64B0EAC5&_nc_sid=10d13b';
+	try {
+		console.log('test');
+		response = await fetch(url, {
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+			},
+		});
+		console.log('test');
+		const buffer = await response.buffer();
+		console.log('test');
+		file = new AttachmentBuilder(buffer, { name: 'video.mp4' });
+	}
+	catch (error) {
+		console.error(error);
+	}
+
+	// embeds[0] = embeds[0].setImage('attachment://video.mp4');
+
+	console.log(embeds[0]);
+
 	if (embeds.length > 0) {
-		response = await messageOrInteraction.reply({ embeds: embeds, components: [row] });
+		response = await messageOrInteraction.reply({ embeds: embeds, components: [row], files: [file] });
 	}
 	else {
 		response = await messageOrInteraction.reply({ content: links.join('\n') });
 	}
+
 
 	if (!isInteraction) {
 		try {

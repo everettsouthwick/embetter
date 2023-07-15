@@ -88,7 +88,7 @@ async function parseThreadsData(url) {
 			favicon: 'https://static.xx.fbcdn.net/rsrc.php/v3/yV/r/_8T3PbCSTRI.png',
 			ogTitle,
 			ogDescription: `${ogDescription}\n\n${engagementStats}`,
-			ogImage,
+			ogImage: { url: 'https://scontent.cdninstagram.com/v/t50.2886-16/359675571_656411129694686_8205107505757813794_n.mp4?_nc_ht=scontent.cdninstagram.com&_nc_cat=102&_nc_ohc=MK_B9btXhGAAX9ykA88&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfDZqwGonBUDGZwYKQ6JGXjFXBSLC7tLgUSy4n22cDxKTA&oe=64B0EAC5&_nc_sid=10d13b' },
 			thumbnail,
 			ogDate,
 		};
