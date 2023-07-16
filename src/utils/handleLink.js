@@ -43,39 +43,47 @@ function replaceLink(message, platform) {
 
 async function handleEmbeds(platform, originalUrl, newUrl) {
 	let embeds = [];
+	let files = [];
 	if (platform.embed) {
 		try {
-			embeds = await buildEmbeds(platform, originalUrl, newUrl);
+			const embedResult = await buildEmbeds(platform, originalUrl, newUrl);
+			embeds = embedResult.embeds;
+			files = embedResult.files;
 		}
 		catch (error) {
 			console.error('Error building embed for', platform.name, ':', error);
 		}
 	}
-	return embeds;
+	return { embeds, files };
 }
 
 async function processLink(message, guildProfile) {
 	let newMessage = message;
 	const links = [];
 	let embeds = [];
+	let files = [];
+	let embedResult = {};
 
 	const platform = getPlatform(message, guildProfile);
 	if (platform) {
 		const replacementResult = replaceLink(message, platform);
 		newMessage = replacementResult.newMessage;
-		embeds = await handleEmbeds(platform, replacementResult.originalUrl, replacementResult.newUrl);
+		embedResult = await handleEmbeds(platform, replacementResult.originalUrl, replacementResult.newUrl);
+		embeds = embedResult.embeds;
+		files = embedResult.files;
 		links.push(replacementResult.newUrl);
 	}
 
-	return { fullMessage: newMessage, links: links, embeds: embeds };
+	return { fullMessage: newMessage, links: links, embeds: embeds, files: files };
 }
 
 async function processArchive(link) {
 	const links = [];
 	let embeds = [];
+	let files = [];
 
 	if (!isValidUrl(link)) {
-		return { links: links, embeds: embeds };
+		return { links: links, embeds: [] };
 	}
 
 	const strippedLink = stripQueryString(link);
@@ -88,13 +96,15 @@ async function processArchive(link) {
 	const newUrl = platform.replacement(strippedLink);
 
 	try {
-		embeds = await buildEmbeds(platform, strippedLink, newUrl);
+		const embedResult = await buildEmbeds(platform, strippedLink, newUrl);
+		embeds = embedResult.embeds;
+		files = embedResult.files;
 	}
 	catch (error) {
 		console.error('Error building embed for', platform.name, ':', error);
 	}
 
-	return { links: links, embeds: embeds };
+	return { links: links, embeds: embeds, files: files };
 }
 
 module.exports = {

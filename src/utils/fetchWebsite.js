@@ -59,17 +59,19 @@ async function parseThreadsData(url) {
 
 		const post = await page.$('div.x11ql9d');
 
-		const links = await post.$$eval('a[role="link"]', (a) => a.map((link) => ({ href: link.href, text: link.innerText })));
-		const images = await post.$$eval('img', (imgs) => imgs.map((img) => img.src));
+		const links = await post.$$eval('a[role="link"]', (a) => a.map((link) => ({ href: link.href, text: link.innerText }))) ?? null;
+		const videos = await post.$$eval('video', (vids) => vids.map((vid) => vid.src)) ?? null;
+		const images = await post.$$eval('img', (imgs) => imgs.map((img) => img.src)) ?? null;
 
-		const ogUrl = links[0].href;
-		const ogTitle = `@${links[1].text}`;
-		const ogDescription = await post.$eval('p span', (span) => span.innerText);
-		const thumbnail = images[0];
-		const ogImage = images.slice(1).map(img => ({ url: img })) ?? null;
-		const ogDate = await post.$eval('time', (time) => time.dateTime);
-		const replies = links[links.length - 1].text;
-		const likes = await post.$eval('div[role="button"] span', (span) => span.innerText);
+		const ogUrl = links[0]?.href ?? null;
+		const ogTitle = `@${links[1]?.text}` ?? null;
+		const ogDescription = await post.$eval('p span', (span) => span.innerText) ?? null;
+		const thumbnail = images[0] ?? null;
+		const ogImage = images?.slice(1).map(img => ({ url: img })) ?? null;
+		const ogDate = await post.$eval('time', (time) => time.dateTime) ?? null;
+		const replies = links[links?.length - 1].text ?? null;
+		const likes = await post.$eval('div[role="button"] span', (span) => span.innerText) ?? null;
+		const video = videos?.map((vid) => ({ url: vid })) ?? null;
 
 		let repliesCount = 0;
 		let likesCount = 0;
@@ -88,9 +90,10 @@ async function parseThreadsData(url) {
 			favicon: 'https://static.xx.fbcdn.net/rsrc.php/v3/yV/r/_8T3PbCSTRI.png',
 			ogTitle,
 			ogDescription: `${ogDescription}\n\n${engagementStats}`,
-			ogImage: { url: 'https://scontent.cdninstagram.com/v/t50.2886-16/359675571_656411129694686_8205107505757813794_n.mp4?_nc_ht=scontent.cdninstagram.com&_nc_cat=102&_nc_ohc=MK_B9btXhGAAX9ykA88&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfDZqwGonBUDGZwYKQ6JGXjFXBSLC7tLgUSy4n22cDxKTA&oe=64B0EAC5&_nc_sid=10d13b' },
+			ogImage,
 			thumbnail,
 			ogDate,
+			video,
 		};
 	}
 	catch (error) {
@@ -104,6 +107,43 @@ async function parseThreadsData(url) {
 	}
 }
 
+async function downloadVideoToBuffer(url) {
+	const headers = {
+		'authority': 'scontent.cdninstagram.com',
+		'accept': '*/*',
+		'accept-encoding': 'identity;q=1, *;q=0',
+		'accept-language': 'en-US,en;q=0.9',
+		'Sec-Ch-Ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+		'Sec-Ch-Ua-Mobile': '?0',
+		'Sec-Ch-Ua-Platform': '"Windows"',
+		'Sec-Fetch-Dest': 'video',
+		'Sec-Fetch-Site': 'cross-site',
+		'cache-control': 'max-age=0',
+		'sec-fetch-mode': 'navigate',
+		'upgrade-insecure-requests': '1',
+		'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+		'viewport-width': '1280',
+	};
+	try {
+		const response = await fetch(url, { headers: headers });
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const buffer = await response.buffer();
+
+		// Extract the id from the URL
+		const id = url.split('/')[5].split('?')[0];
+
+		return { id, buffer };
+	}
+	catch (error) {
+		console.error(error);
+		throw error;
+	}
+}
+
 module.exports = {
 	fetchWebsiteDetails,
+	downloadVideoToBuffer,
 };

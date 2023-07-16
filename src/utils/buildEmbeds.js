@@ -1,9 +1,10 @@
-const { EmbedBuilder } = require('discord.js');
-const { fetchWebsiteDetails } = require('./fetchWebsite.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const { fetchWebsiteDetails, downloadVideoToBuffer } = require('./fetchWebsite.js');
 
 async function buildEmbeds(platform, originalUrl, newUrl) {
 	try {
 		const embeds = [];
+		const files = [];
 		const addedImageUrls = new Set();
 
 		const data = await fetchWebsiteDetails(originalUrl);
@@ -27,6 +28,24 @@ async function buildEmbeds(platform, originalUrl, newUrl) {
 
 		if (data.ogImage?.length > 1 || data.twitterImage?.length > 1) {
 			data.thumbnail = null;
+		}
+
+		if (data.video) {
+			console.log('there is video');
+			for (const video of data.video) {
+				console.log(video);
+				if (video.url) {
+					try {
+						const { id, videoBuffer } = await downloadVideoToBuffer(video.url);
+
+						const file = new AttachmentBuilder(videoBuffer, { name: id || 'video.mp4' });
+						files.push(file);
+					}
+					catch (error) {
+						console.error('Error downloading video:', error);
+					}
+				}
+			}
 		}
 
 		const embed = new EmbedBuilder()
@@ -66,7 +85,7 @@ async function buildEmbeds(platform, originalUrl, newUrl) {
 			}
 		}
 
-		return embeds;
+		return { embeds, files };
 	}
 	catch (error) {
 		console.error('Error building embed:', error);

@@ -1,19 +1,19 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { processArchive, processLink } = require('./handleLink.js');
 const { Mode } = require('../models/Mode.js');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-async function sendReplaceModeMessage(message, fullMessage, embeds) {
+async function sendReplaceModeMessage(message, fullMessage, embeds, files) {
 	await message.delete();
 	if (embeds.length > 0) {
-		await message.channel.send({ content: `${message.author}: ${fullMessage}`, embeds: embeds });
+		await message.channel.send({ content: `${message.author}: ${fullMessage}`, embeds: embeds, files: files });
 	}
 	else {
 		await message.channel.send({ content: `${message.author}: ${fullMessage}` });
 	}
 }
 
-async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
+async function sendReplyModeMessage(messageOrInteraction, links, embeds, files) {
 	const isInteraction = messageOrInteraction.commandId ? true : false;
 
 	const confirm = new ButtonBuilder()
@@ -29,31 +29,10 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	const row = new ActionRowBuilder()
 		.addComponents(confirm, cancel);
 
-	let file;
 	let response;
-	const url = 'https://scontent.cdninstagram.com/v/t50.2886-16/359675571_656411129694686_8205107505757813794_n.mp4?_nc_ht=scontent.cdninstagram.com&_nc_cat=102&_nc_ohc=MK_B9btXhGAAX9ykA88&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfDZqwGonBUDGZwYKQ6JGXjFXBSLC7tLgUSy4n22cDxKTA&oe=64B0EAC5&_nc_sid=10d13b';
-	try {
-		console.log('test');
-		response = await fetch(url, {
-			headers: {
-				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-			},
-		});
-		console.log('test');
-		const buffer = await response.buffer();
-		console.log('test');
-		file = new AttachmentBuilder(buffer, { name: 'video.mp4' });
-	}
-	catch (error) {
-		console.error(error);
-	}
-
-	// embeds[0] = embeds[0].setImage('attachment://video.mp4');
-
-	console.log(embeds[0]);
 
 	if (embeds.length > 0) {
-		response = await messageOrInteraction.reply({ embeds: embeds, components: [row], files: [file] });
+		response = await messageOrInteraction.reply({ embeds: embeds, components: [row], files: files });
 	}
 	else {
 		response = await messageOrInteraction.reply({ content: links.join('\n') });
@@ -103,7 +82,7 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	});
 }
 
-async function sendAskModeMessage(message, links, embeds) {
+async function sendAskModeMessage(message, links, embeds, files) {
 	const confirm = new ButtonBuilder()
 		.setCustomId('yes')
 		.setLabel('Yes')
@@ -124,7 +103,7 @@ async function sendAskModeMessage(message, links, embeds) {
 	collector.on('collect', async (i) => {
 		if (i.customId === 'yes') {
 			await response.delete();
-			await sendReplyModeMessage(message, links, embeds);
+			await sendReplyModeMessage(message, links, embeds, files);
 		}
 		else if (i.customId === 'no') {
 			if (i.user.id === message.author.id) {
@@ -165,9 +144,9 @@ async function checkForEmbed(message) {
 
 
 async function handleContextMenuLink(interaction) {
-	const { links, embeds } = await processLink(interaction.targetMessage.content);
+	const { links, embeds, files } = await processLink(interaction.targetMessage.content);
 	if (links.length > 0 || embeds.length > 0) {
-		await sendReplyModeMessage(interaction, links, embeds);
+		await sendReplyModeMessage(interaction, links, embeds, files);
 	}
 	else {
 		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
@@ -175,9 +154,9 @@ async function handleContextMenuLink(interaction) {
 }
 
 async function handleContextMenuArchive(interaction) {
-	const { links, embeds } = await processArchive(interaction.targetMessage.content);
+	const { links, embeds, files } = await processArchive(interaction.targetMessage.content);
 	if (embeds.length > 0) {
-		await sendReplyModeMessage(interaction, links, embeds);
+		await sendReplyModeMessage(interaction, links, embeds, files);
 	}
 	else {
 		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
@@ -185,9 +164,9 @@ async function handleContextMenuArchive(interaction) {
 }
 
 async function handleSlashCommandLink(interaction) {
-	const { links, embeds } = await processLink(interaction.options.getString('link'));
+	const { links, embeds, files } = await processLink(interaction.options.getString('link'));
 	if (links.length > 0 || embeds.length > 0) {
-		await sendReplyModeMessage(interaction, links, embeds);
+		await sendReplyModeMessage(interaction, links, embeds, files);
 	}
 	else {
 		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
@@ -195,9 +174,9 @@ async function handleSlashCommandLink(interaction) {
 }
 
 async function handleSlashCommandArchive(interaction) {
-	const { links, embeds } = await processArchive(interaction.options.getString('link'));
+	const { links, embeds, files } = await processArchive(interaction.options.getString('link'));
 	if (embeds.length > 0) {
-		await sendReplyModeMessage(interaction, links, embeds);
+		await sendReplyModeMessage(interaction, links, embeds, files);
 	}
 	else {
 		interaction.reply({ content: 'No valid link was found.', ephemeral: true });
@@ -208,16 +187,16 @@ async function handleMessageLink(message) {
 	const guildProfileService = message.client.guildProfileService;
 	const guildProfile = await guildProfileService.getGuildProfile(message.guild.id);
 
-	const { fullMessage, links, embeds } = await processLink(message.content, guildProfile);
+	const { fullMessage, links, embeds, files } = await processLink(message.content, guildProfile);
 	if (links.length > 0 || embeds.length > 0) {
 		if (guildProfile?.mode == Mode.REPLACE) {
-			await sendReplaceModeMessage(message, fullMessage, embeds);
+			await sendReplaceModeMessage(message, fullMessage, embeds, files);
 		}
 		else if (guildProfile?.mode == Mode.REPLY) {
-			await sendReplyModeMessage(message, links, embeds);
+			await sendReplyModeMessage(message, links, embeds, files);
 		}
 		else if (guildProfile?.mode == Mode.ASK) {
-			await sendAskModeMessage(message, links, embeds);
+			await sendAskModeMessage(message, links, embeds, files);
 		}
 	}
 }
