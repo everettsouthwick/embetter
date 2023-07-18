@@ -7,15 +7,7 @@ const platforms = [
 	{
 		name: 'Threads',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?threads\.[^?]+)/g,
-		embed: {
-			author: {
-				name: 'Threads',
-				url: 'https://threads.net/',
-				iconURL: 'https://static.xx.fbcdn.net/rsrc.php/v3/yV/r/_8T3PbCSTRI.png',
-			},
-			color: [0, 0, 0],
-		},
-
+		replacement: (url) => url.replace('threads.', 'vxthreads.'),
 	},
 	{
 		name: 'TikTok',
