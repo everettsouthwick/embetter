@@ -1,7 +1,7 @@
 {
   "name": "embetter",
   "version": "1.1.0",
-  "description": "Embed better with embetter. Replaces social media links from Instagram, Threads, TikTok, Twitter, and premium editorials like The Atlantic, Bloomberg, The New York Times, Rolling Stone, The Wall Street Journal, and The Washington Post with embed-friendly alternatives on Discord.",
+  "description": "Replaces links from certain sites with Discord embed friendly versions.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,9 +14,7 @@
   "dependencies": {
     "discord.js": "^14.11.0",
     "mongodb": "^5.7.0",
-    "node-fetch": "2",
-    "open-graph-scraper": "^6.2.1",
-    "puppeteer": "^20.8.1"
+    "open-graph-scraper": "^6.2.1"
   },
   "devDependencies": {
     "eslint": ">=5.16.0"
