@@ -17,6 +17,7 @@ module.exports = {
 						{ name: 'Threads', value: 'Threads' },
 						{ name: 'TikTok', value: 'TikTok' },
 						{ name: 'Twitter', value: 'Twitter' },
+						{ name: 'Bluesky', value: 'Bluesky' },
 						{ name: 'The Atlantic', value: 'The Atlantic' },
 						{ name: 'Bloomberg', value: 'Bloomberg' },
 						{ name: 'The New York Times', value: 'The New York Times' },

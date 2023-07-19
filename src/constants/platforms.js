@@ -20,6 +20,11 @@ const platforms = [
 		replacement: (url) => url.replace('twitter.', 'vxtwitter.'),
 	},
 	{
+		name: 'Bluesky',
+		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?bsky\.app[^?]+)/g,
+		replacement: (url) => url.replace('bsky.', 'psky.'),
+	},
+	{
 		name: 'The Atlantic',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?theatlantic\.[^?]+)/g,
 		replacement: (url) => `https://archive.today/newest/${url}`,
