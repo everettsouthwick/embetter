@@ -1,7 +1,7 @@
 const platforms = require('../constants/platforms.js');
 const { buildEmbeds } = require('./buildEmbeds.js');
 
-function isValidUrl(string) {
+const isValidUrl = string => {
 	try {
 		new URL(string);
 		return true;
@@ -9,95 +9,46 @@ function isValidUrl(string) {
 	catch (_) {
 		return false;
 	}
-}
+};
 
-function stripQueryString(url) {
-	const urlObject = new URL(url);
-	return urlObject.origin + urlObject.pathname;
-}
+const stripQueryString = url => new URL(url).origin + new URL(url).pathname;
 
-function getPlatform(message, guildProfile) {
+const getPlatform = (message, guildProfile) => {
 	for (const platform of platforms) {
-		if (platform.pattern.test(message)) {
-			if (guildProfile?.platforms?.[platform.name] !== false) {
-				return platform;
-			}
-		}
+		if (!platform.pattern.test(message)) continue;
+		if (guildProfile?.platforms?.[platform.name] === false) continue;
+		return platform;
 	}
 	return null;
-}
+};
 
+const replaceLink = (message, platform) => {
+	const originalUrl = message.match(platform.pattern)[0].split(' ')[0];
+	const newUrl = platform.replacement ? platform.replacement(originalUrl) : originalUrl;
+	return { newMessage: message.replace(platform.pattern, newUrl || originalUrl), originalUrl, newUrl };
+};
 
-function replaceLink(message, platform) {
-	const originalUrl = message.match(platform.pattern)[0];
-	let newMessage = message;
-	let newUrl = originalUrl;
+const handleEmbeds = async (platform, originalUrl, newUrl) => {
+	try { return platform.embed ? await buildEmbeds(platform, originalUrl, newUrl) : []; }
+	catch (error) { console.error('Error building embed for', platform.name, ':', error); return []; }
+};
 
-	if (platform.replacement) {
-		newMessage = message.replace(platform.pattern, platform.replacement);
-		newUrl = platform.replacement(originalUrl);
-	}
-
-	return { newMessage, originalUrl, newUrl };
-}
-
-async function handleEmbeds(platform, originalUrl, newUrl) {
-	let embeds = [];
-	if (platform.embed) {
-		try {
-			embeds = await buildEmbeds(platform, originalUrl, newUrl);
-		}
-		catch (error) {
-			console.error('Error building embed for', platform.name, ':', error);
-		}
-	}
-	return embeds;
-}
-
-async function processLink(message, guildProfile) {
-	let newMessage = message;
-	const links = [];
-	let embeds = [];
-
+const processLink = async (message, guildProfile) => {
 	const platform = getPlatform(message, guildProfile);
-	if (platform) {
-		const replacementResult = replaceLink(message, platform);
-		newMessage = replacementResult.newMessage;
-		embeds = await handleEmbeds(platform, replacementResult.originalUrl, replacementResult.newUrl);
-		links.push(replacementResult.newUrl);
-	}
+	if (!platform) return { fullMessage: message, links: [], embeds: [] };
 
-	return { fullMessage: newMessage, links: links, embeds: embeds };
-}
+	const { newMessage, originalUrl, newUrl } = replaceLink(message, platform);
+	const embeds = await handleEmbeds(platform, originalUrl, newUrl);
+	return { fullMessage: newMessage, links: [newUrl], embeds };
+};
 
-async function processArchive(link) {
-	const links = [];
-	let embeds = [];
-
-	if (!isValidUrl(link)) {
-		return { links: links, embeds: embeds };
-	}
+const processArchive = async link => {
+	if (!isValidUrl(link)) return { links: [], embeds: [] };
 
 	const strippedLink = stripQueryString(link);
-	const platform = {
-		name: 'Archive',
-		pattern: new RegExp(`(${strippedLink})`, 'g'),
-		replacement: (url) => `https://archive.today/newest/${url}`,
-	};
-
-	const newUrl = platform.replacement(strippedLink);
-
-	try {
-		embeds = await buildEmbeds(platform, strippedLink, newUrl);
-	}
-	catch (error) {
-		console.error('Error building embed for', platform.name, ':', error);
-	}
-
-	return { links: links, embeds: embeds };
-}
-
-module.exports = {
-	processLink,
-	processArchive,
+	const newUrl = `https://archive.today/newest/${strippedLink}`;
+	try { return { links: [newUrl], embeds: await buildEmbeds({ name: 'Archive' }, strippedLink, newUrl) }; }
+	catch (error) { console.error('Error building embed for Archive:', error); return { links: [newUrl], embeds: [] }; }
 };
+
+module.exports = { processLink, processArchive };
