@@ -3,10 +3,14 @@ const { fetchWebsiteDetails } = require('./fetchWebsite.js');
 
 async function buildEmbeds(platform, originalUrl, newUrl) {
 	try {
+		const data = await fetchWebsiteDetails(originalUrl);
+
+		if (!data) {
+			return [];
+		}
+
 		const embeds = [];
 		const addedImageUrls = new Set();
-
-		const data = await fetchWebsiteDetails(originalUrl);
 		const base = new URL(data.ogUrl || data.twitterUrl || data.requestUrl || originalUrl);
 
 		if (data.favicon?.includes('.svg')) {
