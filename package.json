@@ -14,7 +14,8 @@
   "dependencies": {
     "discord.js": "^14.11.0",
     "mongodb": "^5.7.0",
-    "open-graph-scraper": "^6.2.1"
+    "open-graph-scraper": "^6.2.1",
+    "random-useragent": "^0.5.0"
   },
   "devDependencies": {
     "eslint": ">=5.16.0"
