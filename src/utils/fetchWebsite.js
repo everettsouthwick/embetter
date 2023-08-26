@@ -22,7 +22,7 @@ async function fetchWebsiteDetails(url) {
 
 	const { error, result } = await ogs(options).catch(err => ({ error: err }));
 
-	if (error && error.includes('403')) {
+	if (error && error.result.error.includes('403')) {
 		return null;
 	}
 

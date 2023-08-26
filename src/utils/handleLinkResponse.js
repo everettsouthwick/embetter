@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, PermissionsBitField } = require('discord.js');
 const { processArchive, processLink } = require('./handleLink.js');
 const { Mode } = require('../models/Mode.js');
 
@@ -24,8 +24,8 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 180000 });
 	collector.on('collect', async (i) => {
 		if (i.customId === 'keep') return collector.stop() && await response.edit({ components: [] });
-		if (i.user.id !== userId && !i.member.permissions.has('MANAGE_MESSAGES')) return await i.reply({ content: 'You are not authorized to delete this message.', ephemeral: true });
-		await collector.stop() && await response.delete();
+		if (i.user.id !== userId && !i.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return await i.reply({ content: 'You are not authorized to delete this message.', ephemeral: true });
+		await await response.delete() && collector.stop();
 	});
 	collector.on('end', async () => await response.edit({ components: [] }).catch(() => {}));
 }
@@ -40,7 +40,7 @@ async function sendAskModeMessage(message, links, embeds) {
 	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 180000 });
 	collector.on('collect', async (i) => {
 		if (i.customId === 'yes') return await response.delete() && await sendReplyModeMessage(message, links, embeds);
-		if (i.user.id !== message.author.id && !i.member.permissions.has('MANAGE_MESSAGES')) return await i.reply({ content: 'You are not authorized to choose not to embed', ephemeral: true });
+		if (i.user.id !== message.author.id && !i.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return await i.reply({ content: 'You are not authorized to choose not to embed', ephemeral: true });
 		await response.delete();
 	});
 	collector.on('end', async () => await response.delete().catch(() => {}));
