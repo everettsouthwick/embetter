@@ -46,7 +46,7 @@ const processArchive = async link => {
 	if (!isValidUrl(link)) return { links: [], embeds: [] };
 
 	const strippedLink = stripQueryString(link);
-	const newUrl = `https://archive.today/newest/${strippedLink}`;
+	const newUrl = `https://web.archive.org/${strippedLink}`;
 	try { return { links: [newUrl], embeds: await buildEmbeds({ name: 'Archive' }, strippedLink, newUrl) }; }
 	catch (error) { console.error('Error building embed for Archive:', error); return { links: [newUrl], embeds: [] }; }
 };
