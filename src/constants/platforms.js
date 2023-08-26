@@ -16,8 +16,8 @@ const platforms = [
 	},
 	{
 		name: 'Twitter',
-		pattern: /(https?:\/\/(?:x\.)?twitter\.[^?]+)/g,
-		replacement: (url) => url.replace(/(x\.)?twitter\./, 'vxtwitter.'),
+		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)*(twitter|x)\.[a-zA-Z0-9-]+[^?]+)/g,
+		replacement: (url) => url.replace(/(twitter|x)\./, 'vxtwitter.'),
 	},
 	{
 		name: 'Bluesky',
@@ -52,7 +52,7 @@ const platforms = [
 	},
 	{
 		name: 'The New York Times',
-		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?nytimes\.[^?]+)/g,
+		pattern: /(https?:\/\/www\.nytimes\.com\/\d{4}\/\d{2}\/\d{2}\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+\.html)|(https?:\/\/www\.nytimes\.com\/article\/[a-zA-Z0-9-]+\.html)/g,
 		replacement: (url) => `https://archive.today/newest/${url}`,
 		embed: {
 			author: {
