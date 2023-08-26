@@ -16,8 +16,8 @@ const platforms = [
 	},
 	{
 		name: 'Twitter',
-		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?twitter\.[^?]+)/g,
-		replacement: (url) => url.replace('twitter.', 'vxtwitter.'),
+		pattern: /(https?:\/\/(?:x\.)?twitter\.[^?]+)/g,
+		replacement: (url) => url.replace(/(x\.)?twitter\./, 'vxtwitter.'),
 	},
 	{
 		name: 'Bluesky',
