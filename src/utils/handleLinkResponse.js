@@ -14,59 +14,36 @@ async function sendReplaceModeMessage(message, fullMessage, embeds) {
 
 async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	const isInteraction = messageOrInteraction.commandId ? true : false;
+	const userId = isInteraction ? messageOrInteraction.user.id : messageOrInteraction.author.id;
 
-	const confirm = new ButtonBuilder()
-		.setCustomId('keep')
-		.setLabel('Keep')
-		.setStyle(ButtonStyle.Primary);
+	const confirm = new ButtonBuilder().setCustomId('keep').setLabel('Keep').setStyle(ButtonStyle.Primary);
+	const cancel = new ButtonBuilder().setCustomId('delete').setLabel('Delete').setStyle(ButtonStyle.Danger);
+	const row = new ActionRowBuilder().addComponents(confirm, cancel);
 
-	const cancel = new ButtonBuilder()
-		.setCustomId('delete')
-		.setLabel('Delete')
-		.setStyle(ButtonStyle.Danger);
+	const options = embeds.length > 0 ? { embeds, components: [row] } : { content: links.join('\n') };
+	const response = await messageOrInteraction.reply(options);
 
-	const row = new ActionRowBuilder()
-		.addComponents(confirm, cancel);
+	if (!isInteraction && !(await checkForEmbed(response))) return await response.delete();
 
-	let response;
-	if (embeds.length > 0) {
-		response = await messageOrInteraction.reply({ embeds: embeds, components: [row] });
-	}
-	else {
-		response = await messageOrInteraction.reply({ content: links.join('\n') });
-	}
+	if (!isInteraction) await response.edit({ components: [row] });
 
-	if (!isInteraction) {
-		try {
-			await checkForEmbed(response);
-			await response.edit({ components: [row] });
-		}
-		catch {
-			await response.delete();
-		}
-	}
-
-	const collector = await response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+	const collector = await response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 180000 });
 
 	collector.on('collect', async (i) => {
-		if (i.customId === 'keep') {
-			if (!isInteraction) {
-				await messageOrInteraction.suppressEmbeds(true);
-			}
+		if (i.customId !== 'keep' && i.customId !== 'delete') return;
 
+		if (i.customId === 'keep') {
+			if (!isInteraction) await messageOrInteraction.suppressEmbeds(true);
 			await collector.stop();
-			await response.edit({ components: [] });
+			return await response.edit({ components: [] });
 		}
-		else if (i.customId === 'delete') {
-			const userId = isInteraction ? messageOrInteraction.user.id : messageOrInteraction.author.id;
-			if (i.user.id === userId) {
-				await collector.stop();
-				await response.delete();
-			}
-			else {
-				await i.reply({ content: 'Only the original author can choose to delete this message.', ephemeral: true });
-			}
+
+		if (i.user.id !== userId && !i.member.permissions.has('MANAGE_MESSAGES')) {
+			return await i.reply({ content: 'You are not authorized to delete this message.', ephemeral: true });
 		}
+
+		await collector.stop();
+		await response.delete();
 	});
 
 	collector.on('end', async () => {
@@ -78,6 +55,7 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 		}
 	});
 }
+
 
 async function sendAskModeMessage(message, links, embeds) {
 	const confirm = new ButtonBuilder()
@@ -95,7 +73,7 @@ async function sendAskModeMessage(message, links, embeds) {
 
 	const response = await message.reply({ content: 'Would you like to embed this link?', components: [row] });
 
-	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 180000 });
 
 	collector.on('collect', async (i) => {
 		if (i.customId === 'yes') {
@@ -131,7 +109,7 @@ async function checkForEmbed(message) {
 				clearInterval(embedCheck);
 				resolve(true);
 			}
-			else if (Date.now() - startTime > 5000) {
+			else if (Date.now() - startTime > 10000) {
 				clearInterval(embedCheck);
 				reject(false);
 			}
