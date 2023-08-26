@@ -25,7 +25,7 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 	collector.on('collect', async (i) => {
 		if (i.customId === 'keep') return collector.stop() && await response.edit({ components: [] });
 		if (i.user.id !== userId && !i.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return await i.reply({ content: 'You are not authorized to delete this message.', ephemeral: true });
-		await await response.delete() && collector.stop();
+		await response.delete() && await collector.stop();
 	});
 	collector.on('end', async () => await response.edit({ components: [] }).catch(() => {}));
 }
