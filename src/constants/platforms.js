@@ -52,7 +52,7 @@ const platforms = [
 	},
 	{
 		name: 'The New York Times',
-		pattern: /(https?:\/\/www\.nytimes\.com\/\d{4}\/\d{2}\/\d{2}\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+\.html)|(https?:\/\/www\.nytimes\.com\/article\/[a-zA-Z0-9-]+\.html)/g,
+		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?nytimes\.com(?!\/crosswords|\/badges).+)/g,
 		replacement: (url) => `https://archive.today/newest/${url}`,
 		embed: {
 			author: {
