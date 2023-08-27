@@ -15,17 +15,25 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 		new ButtonBuilder().setCustomId('keep').setLabel('Keep').setStyle(ButtonStyle.Primary),
 		new ButtonBuilder().setCustomId('delete').setLabel('Delete').setStyle(ButtonStyle.Danger),
 	)];
-	const options = { content: links.join('\n'), embeds: embeds.length ? embeds : undefined, components };
+	const options = { content: links.join('\n'), embeds: embeds.length ? embeds : undefined, components: embeds.length ? components : undefined };
 	const response = await messageOrInteraction.reply(options);
 
-	if (!isInteraction && !(await checkForEmbed(response, embeds))) return await response.delete();
-	if (!isInteraction) await response.edit({ components });
+	if (!isInteraction) {
+		try {
+			await checkForEmbed(response);
+			await response.edit({ components: components });
+		}
+		catch (e) {
+			await response.delete();
+		}
+	}
 
 	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 180000 });
 	collector.on('collect', async (i) => {
 		if (i.customId === 'keep') return collector.stop() && await response.edit({ components: [] });
 		if (i.user.id !== userId && !i.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return await i.reply({ content: 'You are not authorized to delete this message.', ephemeral: true });
-		await response.delete() && await collector.stop();
+		await collector.stop();
+		await response.delete();
 	});
 	collector.on('end', async () => await response.edit({ components: [] }).catch(() => {}));
 }
@@ -49,10 +57,16 @@ async function sendAskModeMessage(message, links, embeds) {
 async function checkForEmbed(message) {
 	if (message.content.includes('archive.today')) return Promise.resolve(true);
 	const startTime = Date.now();
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		const check = setInterval(() => {
-			if (message.embeds.length) return clearInterval(check) && resolve(true);
-			if (Date.now() - startTime > 10000) return clearInterval(check) && resolve(false);
+			if (message.embeds.length) {
+				clearInterval(check);
+				resolve(true);
+			}
+			if (Date.now() - startTime > 10000) {
+				clearInterval(check);
+				reject(false);
+			}
 		}, 200);
 	});
 }
