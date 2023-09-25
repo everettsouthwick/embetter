@@ -30,7 +30,8 @@ async function sendReplyModeMessage(messageOrInteraction, links, embeds) {
 
 	const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 180000 });
 	collector.on('collect', async (i) => {
-		if (i.customId === 'keep') return collector.stop() && await response.edit({ components: [] });
+		if (isInteraction && i.customId === 'keep') return await collector.stop() && await response.edit({ components: [] });
+		if (i.customId === 'keep') return messageOrInteraction.suppressEmbeds(true) && await collector.stop() && await response.edit({ components: [] });
 		if (i.user.id !== userId && !i.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return await i.reply({ content: 'You are not authorized to delete this message.', ephemeral: true });
 		await collector.stop();
 		await response.delete();
