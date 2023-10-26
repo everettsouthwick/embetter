@@ -27,7 +27,7 @@ const platforms = [
 	{
 		name: 'The Atlantic',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?theatlantic\.[^?]+)/g,
-		replacement: (url) => `https://archive.today/newest/${url}`,
+		replacement: (url) => `https://web.archive.org/${url}`,
 		embed: {
 			author: {
 				name: 'The Atlantic',
@@ -40,7 +40,7 @@ const platforms = [
 	{
 		name: 'Bloomberg',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?bloomberg\.[^?]+)/g,
-		replacement: (url) => `https://archive.today/newest/${url}`,
+		replacement: (url) => `https://web.archive.org/${url}`,
 		embed: {
 			author: {
 				name: 'Bloomberg',
@@ -53,7 +53,7 @@ const platforms = [
 	{
 		name: 'The New York Times',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?nytimes\.com(?!\/crosswords|\/badges).+)/g,
-		replacement: (url) => `https://archive.today/newest/${url}`,
+		replacement: (url) => `https://web.archive.org/${url}`,
 		embed: {
 			author: {
 				name: 'The New York Times',
@@ -66,7 +66,7 @@ const platforms = [
 	{
 		name: 'Rolling Stone',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?rollingstone\.[^?]+)/g,
-		replacement: (url) => `https://archive.today/newest/${url}`,
+		replacement: (url) => `https://web.archive.org/${url}`,
 		embed: {
 			author: {
 				name: 'Rolling Stone',
@@ -79,7 +79,7 @@ const platforms = [
 	{
 		name: 'The Wall Street Journal',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?wsj\.[^?]+)/g,
-		replacement: (url) => `https://archive.today/newest/${url}`,
+		replacement: (url) => `https://web.archive.org/${url}`,
 		embed: {
 			author: {
 				name: 'The Wall Street Journal',
@@ -92,7 +92,7 @@ const platforms = [
 	{
 		name: 'The Washington Post',
 		pattern: /(https?:\/\/([a-zA-Z0-9-]+\.)?washingtonpost\.[^?]+)/g,
-		replacement: (url) => `https://archive.today/newest/${url}`,
+		replacement: (url) => `https://web.archive.org/${url}`,
 		embed: {
 			author: {
 				name: 'The Washington Post',

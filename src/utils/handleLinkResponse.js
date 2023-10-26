@@ -56,7 +56,7 @@ async function sendAskModeMessage(message, links, embeds) {
 }
 
 async function checkForEmbed(message) {
-	if (message.content.includes('archive.today')) return Promise.resolve(true);
+	if (message.content.includes('https://web.archive.org/')) return Promise.resolve(true);
 	const startTime = Date.now();
 	return new Promise((resolve, reject) => {
 		const check = setInterval(() => {
