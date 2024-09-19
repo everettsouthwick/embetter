@@ -770,9 +770,9 @@ nth-check@^2.0.1:
     boolbase "^1.0.0"
 
 open-graph-scraper@^6.2.1:
-  version "6.8.1"
-  resolved "https://registry.yarnpkg.com/open-graph-scraper/-/open-graph-scraper-6.8.1.tgz#adf5992b209ffafad6a23c1cf80fb06e889f2b97"
-  integrity sha512-uy9tHm80ir9AnEQclmnlpxU80SBQkwZfWFq0lzRxpNAY1Grcyn7tuOu354XhnfA7C3wNuZ0/j94LNQY5XP7ZRg==
+  version "6.8.2"
+  resolved "https://registry.yarnpkg.com/open-graph-scraper/-/open-graph-scraper-6.8.2.tgz#b5c5956db49dce30df464b15b584567ee21259fd"
+  integrity sha512-Ht3k+bhEfLCojwka13xN+9B6LANJBcANI9TZ28KNBMBlK/dp/ooEblDyzj25RQVzXWUAK4UDlQQHU4hFmCnClg==
   dependencies:
     chardet "^2.0.0"
     cheerio "^1.0.0-rc.12"
