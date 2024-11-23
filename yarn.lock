@@ -153,7 +153,7 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/retry/-/retry-0.4.1.tgz#9a96ce501bc62df46c4031fbd970e3cc6b10f07b"
   integrity sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA==
 
-"@mongodb-js/saslprep@^1.1.5":
+"@mongodb-js/saslprep@^1.1.9":
   version "1.1.9"
   resolved "https://registry.yarnpkg.com/@mongodb-js/saslprep/-/saslprep-1.1.9.tgz#e974bab8eca9faa88677d4ea4da8d09a52069004"
   integrity sha512-tVkljjeEaAhCqTzajSdgbQ6gE6f3oneVwa3iXR6csiEwXXOFsiC6Uh9iAjAhXPtqa/XMDHWjjeNH/77m/Yq2dw==
@@ -269,10 +269,10 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-bson@^6.7.0:
-  version "6.9.0"
-  resolved "https://registry.yarnpkg.com/bson/-/bson-6.9.0.tgz#2be50049430dceaa9300402520fe03e4ed5fdfd6"
-  integrity sha512-X9hJeyeM0//Fus+0pc5dSUMhhrrmWwQUtdavaQeF3Ta6m69matZkGWV/MrBcnwUeLC8W9kwwc2hfkZgUuCX3Ig==
+bson@^6.10.0:
+  version "6.10.0"
+  resolved "https://registry.yarnpkg.com/bson/-/bson-6.10.0.tgz#559c767cc8b605c3ab14e5896214c8f2abdd6a12"
+  integrity sha512-ROchNosXMJD2cbQGm84KoP7vOGPO6/bOAW0veMMbzhXLqoZptcaYRVLitwvuhwhjjpU1qP4YZRWLhgETdgqUQw==
 
 callsites@^3.0.0:
   version "3.1.0"
@@ -744,12 +744,12 @@ mongodb-connection-string-url@^3.0.0:
     whatwg-url "^13.0.0"
 
 mongodb@^6.0.0:
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-6.10.0.tgz#20a9f1cf3c6829e75fc39e6d8c1c19f164209c2e"
-  integrity sha512-gP9vduuYWb9ZkDM546M+MP2qKVk5ZG2wPF63OvSRuUbqCR+11ZCAE1mOfllhlAG0wcoJY5yDL/rV3OmYEwXIzg==
+  version "6.11.0"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-6.11.0.tgz#d09bc055e1e784849279dc41eb2cd1537a0488a0"
+  integrity sha512-yVbPw0qT268YKhG241vAMLaDQAPbRyTgo++odSgGc9kXnzOujQI60Iyj23B9sQQFPSvmNPvMZ3dsFz0aN55KgA==
   dependencies:
-    "@mongodb-js/saslprep" "^1.1.5"
-    bson "^6.7.0"
+    "@mongodb-js/saslprep" "^1.1.9"
+    bson "^6.10.0"
     mongodb-connection-string-url "^3.0.0"
 
 ms@^2.1.3:
