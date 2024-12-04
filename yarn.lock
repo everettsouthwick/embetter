@@ -446,7 +446,7 @@ encoding-sniffer@^0.2.0:
     iconv-lite "^0.6.3"
     whatwg-encoding "^3.1.1"
 
-entities@^4.2.0, entities@^4.4.0, entities@^4.5.0:
+entities@^4.2.0, entities@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/entities/-/entities-4.5.0.tgz#5d268ea5e7113ec74c4d033b79ea5a35a488fb48"
   integrity sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==
@@ -770,14 +770,14 @@ nth-check@^2.0.1:
     boolbase "^1.0.0"
 
 open-graph-scraper@^6.2.1:
-  version "6.8.2"
-  resolved "https://registry.yarnpkg.com/open-graph-scraper/-/open-graph-scraper-6.8.2.tgz#b5c5956db49dce30df464b15b584567ee21259fd"
-  integrity sha512-Ht3k+bhEfLCojwka13xN+9B6LANJBcANI9TZ28KNBMBlK/dp/ooEblDyzj25RQVzXWUAK4UDlQQHU4hFmCnClg==
+  version "6.8.3"
+  resolved "https://registry.yarnpkg.com/open-graph-scraper/-/open-graph-scraper-6.8.3.tgz#9a67bd36647901a064d6bf055015686a47a24ef3"
+  integrity sha512-nzMlmvwoFOcFsghNxtrSMXayxiZKqEN373AbtTGKrOxw6LRXaTay8kBjGpUaTIAc0gsjpnGZloR2uQuNc7QoQA==
   dependencies:
     chardet "^2.0.0"
     cheerio "^1.0.0-rc.12"
     iconv-lite "^0.6.3"
-    undici "^6.19.8"
+    undici "^6.21.0"
 
 optionator@^0.9.3:
   version "0.9.4"
@@ -813,11 +813,11 @@ parent-module@^1.0.0:
     callsites "^3.0.0"
 
 parse5-htmlparser2-tree-adapter@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-7.0.0.tgz#23c2cc233bcf09bb7beba8b8a69d46b08c62c2f1"
-  integrity sha512-B77tOZrqqfUfnVcOrUvfdLbz4pu4RopLD/4vmu3HUPswwTA8OH0EMW9BlWR2B0RCoiZRAHEUu7IxeP1Pd1UU+g==
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-7.1.0.tgz#b5a806548ed893a43e24ccb42fbb78069311e81b"
+  integrity sha512-ruw5xyKs6lrpo9x9rCZqZZnIUntICjQAd0Wsmp396Ul9lN/h+ifgVV1x1gZHi8euej6wTfpqX8j+BFQxF0NS/g==
   dependencies:
-    domhandler "^5.0.2"
+    domhandler "^5.0.3"
     parse5 "^7.0.0"
 
 parse5-parser-stream@^7.1.2:
@@ -828,11 +828,11 @@ parse5-parser-stream@^7.1.2:
     parse5 "^7.0.0"
 
 parse5@^7.0.0, parse5@^7.1.2:
-  version "7.1.2"
-  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.1.2.tgz#0736bebbfd77793823240a23b7fc5e010b7f8e32"
-  integrity sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.2.1.tgz#8928f55915e6125f430cc44309765bf17556a33a"
+  integrity sha512-BuBYQYlv1ckiPdQi/ohiivi9Sagc9JG+Ozs0r7b/0iK3sKmrb0b9FdWdBbOdx6hBCM/F9Ir82ofnBhtZOjCRPQ==
   dependencies:
-    entities "^4.4.0"
+    entities "^4.5.0"
 
 path-exists@^4.0.0:
   version "4.0.0"
@@ -924,10 +924,15 @@ undici-types@~6.19.2:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
   integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
-undici@6.19.8, undici@^6.19.5, undici@^6.19.8:
+undici@6.19.8:
   version "6.19.8"
   resolved "https://registry.yarnpkg.com/undici/-/undici-6.19.8.tgz#002d7c8a28f8cc3a44ff33c3d4be4d85e15d40e1"
   integrity sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==
+
+undici@^6.19.5, undici@^6.21.0:
+  version "6.21.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.21.0.tgz#4b3d3afaef984e07b48e7620c34ed8a285ed4cd4"
+  integrity sha512-BUgJXc752Kou3oOIuU1i+yZZypyZRqNPW0vqoMPl8VaoalSfeR0D8/t4iAS3yirs79SSMTxTag+ZC86uswv+Cw==
 
 uri-js@^4.2.2:
   version "4.4.1"
