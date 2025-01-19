@@ -768,9 +768,9 @@ nth-check@^2.0.1:
     boolbase "^1.0.0"
 
 open-graph-scraper@^6.2.1:
-  version "6.8.4"
-  resolved "https://registry.yarnpkg.com/open-graph-scraper/-/open-graph-scraper-6.8.4.tgz#4ec7fb16c92f900957f394566824e5860011e7c3"
-  integrity sha512-AIhZi5DaQGFY+Kbz6U8ORNw0ZW7ZTS76k8++a/BlMmzZ6FEHNDhVfVBqed5GZ4ery9sHd1OXoNcjgyxoNzIZkg==
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/open-graph-scraper/-/open-graph-scraper-6.9.0.tgz#e3121144b99fbef1f05b944aacabe6f149e16be4"
+  integrity sha512-1KoV5v6GT0/MqlryrVGQROhEAD4u8wC3VjYOxsnhj3mWeGJ6N6nF/rbrcZREFr+kiYm9I5LMrzdK9t9hBMbL2Q==
   dependencies:
     chardet "^2.0.0"
     cheerio "^1.0.0-rc.12"
@@ -928,9 +928,9 @@ undici@6.19.8:
   integrity sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==
 
 undici@^6.19.5, undici@^6.21.0:
-  version "6.21.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-6.21.0.tgz#4b3d3afaef984e07b48e7620c34ed8a285ed4cd4"
-  integrity sha512-BUgJXc752Kou3oOIuU1i+yZZypyZRqNPW0vqoMPl8VaoalSfeR0D8/t4iAS3yirs79SSMTxTag+ZC86uswv+Cw==
+  version "6.21.1"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.21.1.tgz#336025a14162e6837e44ad7b819b35b6c6af0e05"
+  integrity sha512-q/1rj5D0/zayJB2FraXdaWxbhWiNKDvu8naDT2dl1yTlvJp4BLtOcp2a5BvgGNQpYYJzau7tf1WgKv3b+7mqpQ==
 
 uri-js@^4.2.2:
   version "4.4.1"
